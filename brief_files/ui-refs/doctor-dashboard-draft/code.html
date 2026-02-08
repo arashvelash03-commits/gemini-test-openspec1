@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>داشبورد پزشک</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#10b981", 
+              "primary-dark": "#059669",
+              "background-light": "#f3f4f6", 
+              "background-dark": "#111827", 
+              "card-light": "#ffffff",
+              "card-dark": "#1f2937", 
+              "border-light": "#e5e7eb",
+              "border-dark": "#374151",
+              "text-primary-light": "#111827",
+              "text-primary-dark": "#f9fafb",
+              "text-secondary-light": "#6b7280",
+              "text-secondary-dark": "#9ca3af",
+            },
+            fontFamily: {
+              display: ["Vazirmatn", "Inter", "sans-serif"],
+              sans: ["Vazirmatn", "Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "0.75rem",
+              xl: "1rem",
+            },
+          },
+        },
+      };
+    </script>
+<style>
+        body {
+            font-family: 'Vazirmatn', 'Inter', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d1d5db; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af; 
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+             width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark h-screen flex flex-col transition-colors duration-200 overflow-hidden">
+<div class="flex h-full overflow-hidden">
+<aside class="w-80 border-l border-border-light dark:border-border-dark bg-card-light dark:bg-card-dark hidden lg:flex flex-col flex-none h-full z-20 shadow-lg">
+<div class="p-5 border-b border-border-light dark:border-border-dark flex-none flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-2xl">smart_toy</span>
+<div>
+<h2 class="font-bold text-text-primary-light dark:text-text-primary-dark">دستیار هوشمند</h2>
+<p class="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">نسخه ۴.۲ (متصل)</p>
+</div>
+</div>
+<button class="text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center p-6 text-center overflow-y-auto">
+<div class="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center mb-4 transform rotate-3">
+<span class="material-symbols-outlined text-4xl text-emerald-500">chat_bubble</span>
+</div>
+<h3 class="font-bold text-lg text-text-primary-light dark:text-text-primary-dark mb-2">گفتگو با هوش مصنوعی</h3>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark leading-relaxed max-w-[200px]">
+                    برای بررسی تداخلات دارویی یا خلاصه پرونده بیمار، سوال خود را اینجا بپرسید.
+                </p>
+<button class="mt-6 px-4 py-2 bg-white dark:bg-gray-800 border border-border-light dark:border-border-dark rounded-lg text-sm font-medium hover:shadow-md transition-all flex items-center gap-2 text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-symbols-outlined text-lg">add</span>
+                    گفتگوی جدید
+                </button>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark bg-gray-50/50 dark:bg-gray-900/50 flex-none">
+<div class="flex items-center justify-between mb-3">
+<h3 class="text-xs font-bold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wide">پیشنهادات هوشمند</h3>
+<span class="flex h-2 w-2 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+</span>
+</div>
+<div class="space-y-3">
+<div class="p-3 bg-white dark:bg-card-dark border border-emerald-100 dark:border-emerald-800/30 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+<div class="flex gap-3 items-start">
+<div class="bg-emerald-50 dark:bg-emerald-900/30 p-1.5 rounded-lg text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/50 transition-colors">
+<span class="material-symbols-outlined text-lg">medical_information</span>
+</div>
+<div>
+<p class="text-xs font-medium text-text-primary-light dark:text-text-primary-dark leading-snug mb-1">بروزرسانی پروتکل شیمی‌درمانی</p>
+<p class="text-[10px] text-text-secondary-light dark:text-text-secondary-dark leading-relaxed">تغییر دوز پیشنهادی برای بیمار خانم رحیمی بر اساس آزمایش خون اخیر.</p>
+</div>
+</div>
+</div>
+<div class="p-3 bg-white dark:bg-card-dark border border-border-light dark:border-border-dark rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer opacity-75 hover:opacity-100">
+<div class="flex gap-3 items-start">
+<div class="bg-blue-50 dark:bg-blue-900/30 p-1.5 rounded-lg text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined text-lg">event_repeat</span>
+</div>
+<div>
+<p class="text-xs font-medium text-text-primary-light dark:text-text-primary-dark leading-snug mb-1">پیگیری آزمایشات</p>
+<p class="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">نتیجه پاتولوژی ۳ بیمار آماده بررسی است.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<div class="flex-1 flex flex-col h-full overflow-hidden bg-gray-50/50 dark:bg-black/20 relative">
+<header class="h-20 bg-card-light dark:bg-card-dark border-b border-border-light dark:border-border-dark flex items-center justify-between px-6 z-10 shrink-0">
+<div class="flex items-center gap-4 min-w-max">
+<div class="relative">
+<div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 border-2 border-white dark:border-gray-700 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xl shadow-sm">
+                            ر
+                        </div>
+<div class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-card-dark rounded-full"></div>
+</div>
+<div class="hidden sm:block">
+<h1 class="font-bold text-text-primary-light dark:text-text-primary-dark text-lg">دکتر رضا پاگه</h1>
+<div class="flex items-center gap-1.5 text-xs text-text-secondary-light dark:text-text-secondary-dark">
+<span>متخصص انکولوژی</span>
+<span class="w-1 h-1 rounded-full bg-gray-300 dark:bg-gray-600"></span>
+<span>شیفت صبح</span>
+</div>
+</div>
+</div>
+<div class="flex-1 max-w-2xl px-6 lg:px-12">
+<div class="relative group">
+<span class="material-symbols-outlined absolute top-1/2 -translate-y-1/2 right-4 text-text-secondary-light dark:text-text-secondary-dark group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full h-12 pr-12 pl-4 bg-gray-100 dark:bg-gray-800 border-none rounded-xl focus:ring-2 focus:ring-primary/50 text-sm transition-all placeholder-gray-400 dark:placeholder-gray-500 shadow-sm focus:bg-white dark:focus:bg-gray-900" placeholder="جستجوی نام بیمار، کد ملی یا شماره پرونده..." type="text"/>
+<div class="absolute top-1/2 -translate-y-1/2 left-3 hidden sm:flex items-center gap-1">
+<kbd class="hidden lg:inline-flex items-center h-6 px-2 text-[10px] font-mono text-gray-500 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded shadow-sm">Ctrl + K</kbd>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="hidden md:flex flex-col items-end mx-2">
+<span class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark">۱۶ بهمن ۱۴۰۲</span>
+<span class="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">دوشنبه</span>
+</div>
+<div class="h-8 w-px bg-border-light dark:border-border-dark mx-1 hidden md:block"></div>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark relative transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white dark:border-card-dark"></span>
+</button>
+<button class="w-10 h-10 rounded-xl flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 text-text-secondary-light dark:text-text-secondary-dark transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-sm border border-border-light dark:border-border-dark flex items-center justify-between group hover:border-emerald-200 dark:hover:border-emerald-800 transition-colors">
+<div>
+<p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">بیماران امروز</p>
+<h3 class="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">۱۲</h3>
+</div>
+<div class="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">groups</span>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-sm border border-border-light dark:border-border-dark flex items-center justify-between group hover:border-red-200 dark:hover:border-red-900 transition-colors">
+<div>
+<p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">هشدارهای بحرانی</p>
+<h3 class="text-3xl font-bold text-red-600 dark:text-red-400">۳</h3>
+</div>
+<div class="w-12 h-12 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">warning</span>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-2xl p-5 shadow-sm border border-border-light dark:border-border-dark flex items-center justify-between group hover:border-blue-200 dark:hover:border-blue-900 transition-colors">
+<div>
+<p class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark mb-1">گزارش‌های معلق</p>
+<h3 class="text-3xl font-bold text-text-primary-light dark:text-text-primary-dark">۸</h3>
+</div>
+<div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-2xl">assignment_late</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-3">
+<h2 class="text-xl font-bold text-text-primary-light dark:text-text-primary-dark">صف انتظار مراجعات</h2>
+<span class="bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark px-2.5 py-0.5 rounded-full text-xs font-bold">۲۴</span>
+</div>
+<div class="flex gap-2">
+<button class="p-2 text-text-secondary-light dark:text-text-secondary-dark hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors" title="فیلتر">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 text-text-secondary-light dark:text-text-secondary-dark hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors" title="تازه سازی">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-2xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50/50 dark:bg-gray-800/50 border-b border-border-light dark:border-border-dark text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark">
+<div class="col-span-4 lg:col-span-3">بیمار</div>
+<div class="col-span-3 lg:col-span-2">نوع مراجعه</div>
+<div class="col-span-2 lg:col-span-2">زمان نوبت</div>
+<div class="col-span-3 lg:col-span-3">وضعیت / جزئیات</div>
+<div class="col-span-12 lg:col-span-2 hidden lg:block text-end">عملیات</div>
+</div>
+<div class="group relative overflow-hidden transition-all hover:bg-gray-50 dark:hover:bg-gray-800/30 border-b border-border-light dark:border-border-dark last:border-0">
+<div class="absolute right-0 top-0 bottom-0 w-1 bg-emerald-500 animate-pulse z-10"></div>
+<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+<div class="col-span-4 lg:col-span-3 flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold">ز</div>
+<span class="absolute -bottom-0.5 -right-0.5 flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white dark:border-card-dark"></span>
+</span>
+</div>
+<div>
+<p class="font-bold text-text-primary-light dark:text-text-primary-dark text-sm">زهرا رحیمی</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">پرونده: ۱۴۰۲-۸۹</p>
+</div>
+</div>
+<div class="col-span-3 lg:col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800/50">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        مشاوره
+                                    </span>
+</div>
+<div class="col-span-2 lg:col-span-2">
+<div class="flex items-center gap-1.5 text-text-primary-light dark:text-text-primary-dark font-mono text-sm">
+<span class="material-symbols-outlined text-base text-text-secondary-light opacity-70">schedule</span>
+                                        ۰۸:۳۰
+                                    </div>
+</div>
+<div class="col-span-3 lg:col-span-3">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">در حال ویزیت</span>
+<span class="text-[10px] text-text-secondary-light dark:text-text-secondary-dark">تخمین مدت: ۱۵ دقیقه</span>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-2 flex justify-end mt-2 lg:mt-0">
+<button class="w-full lg:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm shadow-emerald-200 dark:shadow-none flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-base">check</span>
+                                        پایان ویزیت
+                                    </button>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden transition-all hover:bg-gray-50 dark:hover:bg-gray-800/30 border-b border-border-light dark:border-border-dark last:border-0">
+<div class="absolute right-0 top-0 bottom-0 w-1 bg-blue-500"></div>
+<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+<div class="col-span-4 lg:col-span-3 flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 flex items-center justify-center font-bold">م</div>
+<span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-blue-500 border-2 border-white dark:border-card-dark rounded-full"></span>
+</div>
+<div>
+<p class="font-bold text-text-primary-light dark:text-text-primary-dark text-sm">محمد رضایی</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">پرونده: ۱۴۰۱-۳۲</p>
+</div>
+</div>
+<div class="col-span-3 lg:col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-800/50">
+                                        پیگیری
+                                    </span>
+</div>
+<div class="col-span-2 lg:col-span-2">
+<div class="flex items-center gap-1.5 text-text-primary-light dark:text-text-primary-dark font-mono text-sm">
+<span class="material-symbols-outlined text-base text-text-secondary-light opacity-70">schedule</span>
+                                        ۰۹:۰۰
+                                    </div>
+</div>
+<div class="col-span-3 lg:col-span-3">
+<div class="flex flex-col gap-1">
+<span class="text-xs font-bold text-blue-600 dark:text-blue-400">در درمانگاه</span>
+<span class="text-[10px] text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px]">hourglass_top</span>
+                                            انتظار: ۱۰ دقیقه
+                                        </span>
+</div>
+</div>
+<div class="col-span-12 lg:col-span-2 flex justify-end mt-2 lg:mt-0">
+<button class="w-full lg:w-auto px-4 py-2 bg-white dark:bg-card-dark border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800 text-text-primary-light dark:text-text-primary-dark rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2">
+                                        فراخوانی
+                                    </button>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden transition-all hover:bg-gray-50 dark:hover:bg-gray-800/30 border-b border-border-light dark:border-border-dark last:border-0 opacity-80 hover:opacity-100">
+<div class="absolute right-0 top-0 bottom-0 w-1 bg-gray-300 dark:bg-gray-600"></div>
+<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+<div class="col-span-4 lg:col-span-3 flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center font-bold">س</div>
+</div>
+<div>
+<p class="font-bold text-text-primary-light dark:text-text-primary-dark text-sm">سارا کریمی</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">پرونده: ۱۴۰۲-۱۱</p>
+</div>
+</div>
+<div class="col-span-3 lg:col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark border border-gray-200 dark:border-gray-700">
+<span class="material-symbols-outlined text-sm">videocam</span>
+                                        ویزیت آنلاین
+                                    </span>
+</div>
+<div class="col-span-2 lg:col-span-2">
+<div class="flex items-center gap-1.5 text-text-primary-light dark:text-text-primary-dark font-mono text-sm">
+<span class="material-symbols-outlined text-base text-text-secondary-light opacity-70">schedule</span>
+                                        ۰۹:۴۵
+                                    </div>
+</div>
+<div class="col-span-3 lg:col-span-3">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark">منتظر مراجعه</span>
+</div>
+<div class="col-span-12 lg:col-span-2 flex justify-end mt-2 lg:mt-0">
+<button class="w-full lg:w-auto px-4 py-2 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors text-xs font-medium flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-base">info</span>
+                                        جزئیات
+                                    </button>
+</div>
+</div>
+</div>
+<div class="group relative overflow-hidden transition-all hover:bg-gray-50 dark:hover:bg-gray-800/30 last:border-0 opacity-80 hover:opacity-100">
+<div class="absolute right-0 top-0 bottom-0 w-1 bg-gray-300 dark:bg-gray-600"></div>
+<div class="grid grid-cols-12 gap-4 px-6 py-4 items-center">
+<div class="col-span-4 lg:col-span-3 flex items-center gap-3">
+<div class="relative">
+<div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 flex items-center justify-center font-bold">ع</div>
+</div>
+<div>
+<p class="font-bold text-text-primary-light dark:text-text-primary-dark text-sm">علی اصغری</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">پرونده: ۱۴۰۱-۹۹</p>
+</div>
+</div>
+<div class="col-span-3 lg:col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark border border-gray-200 dark:border-gray-700">
+                                        مشاوره اولیه
+                                    </span>
+</div>
+<div class="col-span-2 lg:col-span-2">
+<div class="flex items-center gap-1.5 text-text-primary-light dark:text-text-primary-dark font-mono text-sm">
+<span class="material-symbols-outlined text-base text-text-secondary-light opacity-70">schedule</span>
+                                        ۱۰:۱۵
+                                    </div>
+</div>
+<div class="col-span-3 lg:col-span-3">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark">منتظر مراجعه</span>
+</div>
+<div class="col-span-12 lg:col-span-2 flex justify-end mt-2 lg:mt-0">
+<button class="w-full lg:w-auto px-4 py-2 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors text-xs font-medium flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-base">info</span>
+                                        جزئیات
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</div>
+
+</body></html>
