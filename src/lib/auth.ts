@@ -1,30 +1,25 @@
-import { NextAuthOptions } from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
+import NextAuth, { type DefaultSession } from "next-auth";
+import Credentials from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, or } from "drizzle-orm";
 import bcrypt from "bcrypt";
+import { z } from "zod";
 
-export const authOptions: NextAuthOptions = {
-  session: {
-    strategy: "jwt",
-  },
-  pages: {
-    signIn: "/login",
-  },
+const signInSchema = z.object({
+  identifier: z.string(),
+  password: z.string(),
+});
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
-    CredentialsProvider({
-      name: "Credentials",
+    Credentials({
       credentials: {
         identifier: { label: "Phone or National Code", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
-        if (!credentials?.identifier || !credentials?.password) {
-          return null;
-        }
-
-        const { identifier, password } = credentials;
+      authorize: async (credentials) => {
+        const { identifier, password } = await signInSchema.parseAsync(credentials);
 
         const user = await db.query.users.findFirst({
           where: or(
@@ -63,10 +58,13 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.role = token.role as string; // cast as string or define types
+        session.user.role = token.role as string;
         session.user.id = token.id as string;
       }
       return session;
     },
   },
-};
+  pages: {
+    signIn: "/login",
+  },
+});
