@@ -1,11 +1,16 @@
 
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
-require('dotenv').config();
+const dotenv = require('dotenv');
+
+// Load .env.local
+dotenv.config({ path: '.env.local' });
+// Fallback to .env
+dotenv.config();
 
 async function seed() {
   if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL is not defined');
+    console.error('DATABASE_URL is not defined in .env.local or .env');
     process.exit(1);
   }
 
@@ -14,11 +19,6 @@ async function seed() {
   });
 
   const passwordHash = await bcrypt.hash('password123', 10);
-
-  // UUID generation in SQL if pgcrypto/uuid-ossp is not available or handled by defaultRandom()
-  // But standard postgres usually needs `gen_random_uuid()` (v13+) or extension.
-  // We'll rely on the default value if we can, or generate one in JS.
-  // Ideally, we just INSERT and let the default handle it.
 
   const client = await pool.connect();
 
