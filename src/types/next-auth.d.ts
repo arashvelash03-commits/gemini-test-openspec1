@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession } from "next-auth";
+import { DefaultSession } from "next-auth";
 
 declare module "next-auth" {
   /**
@@ -9,6 +9,7 @@ declare module "next-auth" {
       /** The user's role. */
       role: string;
       id: string;
+      totpEnabled: boolean;
     } & DefaultSession["user"];
   }
 
@@ -17,6 +18,7 @@ declare module "next-auth" {
     id: string;
     // fullName is used in our DB, but NextAuth expects name. We map it.
     fullName?: string | null;
+    totpEnabled: boolean;
   }
 }
 
@@ -24,5 +26,6 @@ declare module "next-auth/jwt" {
   interface JWT {
     role: string;
     id: string;
+    totpEnabled: boolean;
   }
 }

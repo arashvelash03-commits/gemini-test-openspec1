@@ -12,7 +12,6 @@ import {
   foreignKey,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
-import { sql } from "drizzle-orm";
 
 export const userRoleEnum = pgEnum("user_role", ["doctor", "clerk", "patient", "admin"]);
 export const fhirGenderEnum = pgEnum("fhir_gender", ["male", "female", "other", "unknown"]);
