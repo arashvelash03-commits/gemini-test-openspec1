@@ -428,3 +428,44 @@ https://nextjs.org/docs/messages/module-not-found
 ✓ Compiled in 400ms
 ✓ Compiled in 293ms
 ✓ Compiled in 560ms
+⨯ ./src/lib/auth.ts:6:1
+Module not found: Can't resolve 'bcrypt'
+[0m [90m 4 |[39m [36mimport[39m { users } [36mfrom[39m [32m"@/lib/db/schema"[39m[33m;[39m
+ [90m 5 |[39m [36mimport[39m { eq[33m,[39m or } [36mfrom[39m [32m"drizzle-orm"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m bcrypt [36mfrom[39m [32m"bcrypt"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 7 |[39m [36mimport[39m { z } [36mfrom[39m [32m"zod"[39m[33m;[39m
+ [90m 8 |[39m [36mimport[39m { authenticator } [36mfrom[39m [32m"otplib"[39m[33m;[39m
+ [90m 9 |[39m[0m
+
+
+
+Import trace:
+  Server Component:
+    ./src/lib/auth.ts
+    ./src/app/(auth)/login/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/lib/auth.ts:6:1
+Module not found: Can't resolve 'bcrypt'
+[0m [90m 4 |[39m [36mimport[39m { users } [36mfrom[39m [32m"@/lib/db/schema"[39m[33m;[39m
+ [90m 5 |[39m [36mimport[39m { eq[33m,[39m or } [36mfrom[39m [32m"drizzle-orm"[39m[33m;[39m
+[31m[1m>[22m[39m[90m 6 |[39m [36mimport[39m bcrypt [36mfrom[39m [32m"bcrypt"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 7 |[39m [36mimport[39m { z } [36mfrom[39m [32m"zod"[39m[33m;[39m
+ [90m 8 |[39m [36mimport[39m { authenticator } [36mfrom[39m [32m"otplib"[39m[33m;[39m
+ [90m 9 |[39m[0m
+
+
+
+Import trace:
+  Server Component:
+    ./src/lib/auth.ts
+    ./src/app/(auth)/login/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 740ms

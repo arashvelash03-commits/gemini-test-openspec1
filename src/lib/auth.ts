@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, or } from "drizzle-orm";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { authenticator } from "otplib";
 
@@ -78,7 +78,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           };
         } catch (error) {
           console.error("Authorize error:", error);
-          throw error; // Re-throw to let NextAuth handle it (or masking it)
+          throw error;
         }
       },
     }),
