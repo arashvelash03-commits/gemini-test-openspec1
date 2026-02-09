@@ -5,11 +5,11 @@ import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
 
 const schema = z.object({
   identifier: z.string().min(1, "شماره همراه یا کد ملی الزامی است"),
   password: z.string().min(1, "کلمه عبور الزامی است"),
+  totpCode: z.string().optional(),
 });
 
 export default function LoginForm() {
@@ -17,6 +17,8 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [requireTotp, setRequireTotp] = useState(false);
+  const [credentials, setCredentials] = useState({ identifier: "", password: "" });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,7 +28,13 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData);
 
-    const result = schema.safeParse(data);
+    // In TOTP mode, we combine the stored credentials with the entered TOTP code
+    const submissionData = requireTotp ? {
+        ...credentials,
+        totpCode: data.totpCode
+    } : data;
+
+    const result = schema.safeParse(submissionData);
     if (!result.success) {
       setError(result.error.errors[0].message);
       setLoading(false);
@@ -37,18 +45,32 @@ export default function LoginForm() {
       const res = await signIn("credentials", {
         identifier: result.data.identifier,
         password: result.data.password,
+        totpCode: result.data.totpCode || undefined,
         redirect: false,
       });
 
       if (res?.error) {
-        setError("اطلاعات وارد شده صحیح نمی‌باشد");
-        setLoading(false);
+        // Simple string check for the error message
+        if (res.error.includes("TOTP_REQUIRED") || res.code === "TOTP_REQUIRED") {
+            setRequireTotp(true);
+            setCredentials({
+                identifier: result.data.identifier as string,
+                password: result.data.password as string,
+            });
+            setError(""); // Clear previous error
+        } else if (res.error.includes("INVALID_TOTP")) {
+            setError("کد تایید اشتباه است");
+        } else {
+            setError("اطلاعات وارد شده صحیح نمی‌باشد");
+        }
       } else {
-        router.push("/dashboard"); // Redirect to dashboard
+        router.push("/dashboard");
         router.refresh();
       }
     } catch (err) {
+      console.error(err);
       setError("خطایی رخ داده است");
+    } finally {
       setLoading(false);
     }
   }
@@ -77,6 +99,9 @@ export default function LoginForm() {
                   {error}
                 </div>
               )}
+
+              {!requireTotp ? (
+              <>
               <div className="space-y-2">
                 <label
                   className="text-sm font-semibold text-slate-700 block mr-1"
@@ -95,6 +120,7 @@ export default function LoginForm() {
                     placeholder="مثلا: ۰۹۱۲۳۴۵۶۷۸۹"
                     type="text"
                     disabled={loading}
+                    autoFocus
                   />
                 </div>
               </div>
@@ -128,18 +154,60 @@ export default function LoginForm() {
                   </button>
                 </div>
               </div>
+              </>
+              ) : (
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-semibold text-slate-700 block mr-1"
+                    htmlFor="totpCode"
+                  >
+                    کد تایید دو مرحله‌ای (Google Authenticator)
+                  </label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+                      key
+                    </span>
+                    <input
+                      className="w-full h-12 pr-11 pl-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 focus:outline-none text-center tracking-widest text-lg"
+                      id="totpCode"
+                      name="totpCode"
+                      placeholder="------"
+                      type="text"
+                      maxLength={6}
+                      disabled={loading}
+                      autoFocus
+                    />
+                  </div>
+                </div>
+              )}
+
               <button
                 className="w-full h-12 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                 type="submit"
                 disabled={loading}
               >
-                <span>{loading ? "در حال ورود..." : "ورود"}</span>
+                <span>{loading ? "در حال پردازش..." : (requireTotp ? "تایید" : "ورود")}</span>
                 {!loading && (
                   <span className="material-symbols-outlined text-[20px]">
-                    login
+                    {requireTotp ? "check" : "login"}
                   </span>
                 )}
               </button>
+
+              {requireTotp && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                        setRequireTotp(false);
+                        setCredentials({ identifier: "", password: "" });
+                        setError("");
+                    }}
+                    className="w-full text-sm text-slate-500 hover:text-primary mt-2 transition-colors"
+                  >
+                      بازگشت به صفحه ورود
+                  </button>
+              )}
+
             </form>
             <div className="mt-8 pt-6 border-t border-slate-50 text-center">
               <Link

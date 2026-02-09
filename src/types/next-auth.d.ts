@@ -15,6 +15,8 @@ declare module "next-auth" {
   interface User {
     role: string;
     id: string;
+    // fullName is used in our DB, but NextAuth expects name. We map it.
+    fullName?: string | null;
   }
 }
 

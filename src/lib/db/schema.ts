@@ -9,7 +9,6 @@ import {
   jsonb,
   integer,
   primaryKey,
-  uniqueIndex,
   foreignKey,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
@@ -21,8 +20,8 @@ export const fhirStatusEnum = pgEnum("fhir_status", ["active", "inactive", "erro
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
-  nationalCode: text("national_code").unique(),
-  phoneNumber: text("phone_number"),
+  nationalCode: text("national_code").unique().notNull(), // Made notNull as it's the primary unique ID
+  phoneNumber: text("phone_number"), // Not unique
   passwordHash: text("password_hash"),
   createdBy: uuid("created_by"),
   role: userRoleEnum("role").default("patient").notNull(),
@@ -37,12 +36,6 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
-
-  // NextAuth compatibility
-  name: text("name"),
-  email: text("email"),
-  emailVerified: timestamp("emailVerified", { mode: "date" }),
-  image: text("image"),
 }, (table) => {
   return {
     createdByReference: foreignKey({
@@ -50,7 +43,6 @@ export const users = pgTable("users", {
       foreignColumns: [table.id],
       name: "users_created_by_fkey"
     }),
-    uniquePhone: uniqueIndex("idx_users_unique_phone").on(table.phoneNumber).where(sql`phone_number IS NOT NULL`),
   };
 });
 
