@@ -11,7 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:seed": "node scripts/seed.js",
-    "db:debug": "node scripts/debug-db.js"
+    "db:debug": "node scripts/debug-db.js",
+    "test:login": "node scripts/test-login.js"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.20",
