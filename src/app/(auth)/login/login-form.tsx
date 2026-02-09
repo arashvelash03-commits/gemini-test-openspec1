@@ -75,6 +75,12 @@ export default function LoginForm() {
     }
   }
 
+  const handleTotpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Limit to 6 digits
+      const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 6);
+      e.target.value = val;
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen p-4">
       <div className="w-full max-w-md">
@@ -82,20 +88,20 @@ export default function LoginForm() {
           <div className="p-8 pb-0 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4">
               <span className="material-symbols-outlined text-primary text-4xl">
-                oncology
+                {requireTotp ? "verified_user" : "oncology"}
               </span>
             </div>
             <h1 className="text-2xl font-bold text-slate-900 mb-2">
-              ورود به سامانه
+              {requireTotp ? "تایید دو مرحله‌ای" : "ورود به سامانه"}
             </h1>
             <p className="text-slate-500 text-sm">
-              لطفاً اطلاعات کاربری خود را وارد کنید
+              {requireTotp ? "کد ۶ رقمی Google Authenticator را وارد کنید" : "لطفاً اطلاعات کاربری خود را وارد کنید"}
             </p>
           </div>
           <div className="p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-xl text-center">
+                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-xl text-center border border-red-100">
                   {error}
                 </div>
               )}
@@ -161,14 +167,14 @@ export default function LoginForm() {
                     className="text-sm font-semibold text-slate-700 block mr-1"
                     htmlFor="totpCode"
                   >
-                    کد تایید دو مرحله‌ای (Google Authenticator)
+                    کد تایید
                   </label>
                   <div className="relative">
                     <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                       key
                     </span>
                     <input
-                      className="w-full h-12 pr-11 pl-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 focus:outline-none text-center tracking-widest text-lg"
+                      className="w-full h-12 pr-11 pl-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 focus:outline-none text-center tracking-[1em] text-lg font-bold"
                       id="totpCode"
                       name="totpCode"
                       placeholder="------"
@@ -176,6 +182,7 @@ export default function LoginForm() {
                       maxLength={6}
                       disabled={loading}
                       autoFocus
+                      onChange={handleTotpChange}
                     />
                   </div>
                 </div>
@@ -186,10 +193,10 @@ export default function LoginForm() {
                 type="submit"
                 disabled={loading}
               >
-                <span>{loading ? "در حال پردازش..." : (requireTotp ? "تایید" : "ورود")}</span>
+                <span>{loading ? "در حال پردازش..." : (requireTotp ? "تایید و ورود" : "ورود")}</span>
                 {!loading && (
                   <span className="material-symbols-outlined text-[20px]">
-                    {requireTotp ? "check" : "login"}
+                    {requireTotp ? "check_circle" : "login"}
                   </span>
                 )}
               </button>
@@ -202,21 +209,24 @@ export default function LoginForm() {
                         setCredentials({ identifier: "", password: "" });
                         setError("");
                     }}
-                    className="w-full text-sm text-slate-500 hover:text-primary mt-2 transition-colors"
+                    className="w-full text-sm text-slate-500 hover:text-primary mt-4 transition-colors flex items-center justify-center gap-1"
                   >
+                      <span className="material-symbols-outlined text-sm">arrow_forward</span>
                       بازگشت به صفحه ورود
                   </button>
               )}
 
             </form>
-            <div className="mt-8 pt-6 border-t border-slate-50 text-center">
-              <Link
-                className="text-sm text-slate-500 hover:text-primary transition-colors font-medium"
-                href="#"
-              >
-                فراموشی کلمه عبور؟
-              </Link>
-            </div>
+            {!requireTotp && (
+                <div className="mt-8 pt-6 border-t border-slate-50 text-center">
+                <Link
+                    className="text-sm text-slate-500 hover:text-primary transition-colors font-medium"
+                    href="#"
+                >
+                    فراموشی کلمه عبور؟
+                </Link>
+                </div>
+            )}
           </div>
         </div>
         <p className="mt-8 text-center text-slate-400 text-xs">

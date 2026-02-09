@@ -1,5 +1,6 @@
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import { authConfig } from "./auth.config";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, or } from "drizzle-orm";
@@ -14,6 +15,7 @@ const signInSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   providers: [
     Credentials({
       credentials: {
@@ -22,8 +24,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         totpCode: { label: "TOTP Code", type: "text" },
       },
       authorize: async (credentials) => {
-        // console.log("Authorize called with identifier:", credentials?.identifier);
-
         try {
           const { identifier, password, totpCode } = await signInSchema.parseAsync(credentials);
 
@@ -35,49 +35,41 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           });
 
           if (!user) {
-            // console.log("User not found for identifier:", identifier);
             return null;
           }
 
           if (!user.passwordHash) {
-             // console.log("User has no password hash");
              return null;
           }
 
           const passwordMatch = await bcrypt.compare(password, user.passwordHash);
 
           if (!passwordMatch) {
-            // console.log("Password mismatch");
             return null;
           }
 
           if (user.totpEnabled) {
-            // console.log("TOTP enabled for user");
             if (!totpCode) {
-              // console.log("TOTP code missing, throwing TOTP_REQUIRED");
               throw new Error("TOTP_REQUIRED");
             }
 
             if (!user.totpSecret) {
-               // console.log("TOTP enabled but secret missing");
                throw new Error("TOTP_SETUP_ERROR");
             }
 
             const isValidTotp = authenticator.check(totpCode, user.totpSecret);
             if (!isValidTotp) {
-              // console.log("Invalid TOTP code");
               throw new Error("INVALID_TOTP");
             }
           }
 
-          // console.log("User authenticated successfully:", user.id);
           return {
             id: user.id,
-            name: user.fullName, // Mapping fullName to name
+            name: user.fullName,
             role: user.role,
+            totpEnabled: user.totpEnabled || false,
           };
         } catch (error) {
-          // Only log unexpected errors, not the flow control errors
           if (error instanceof Error &&
              (error.message === "TOTP_REQUIRED" || error.message === "INVALID_TOTP" || error.message === "TOTP_SETUP_ERROR")) {
              throw error;
@@ -88,29 +80,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role;
-        token.id = user.id;
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        session.user.role = token.role as string;
-        session.user.id = token.id as string;
-      }
-      return session;
-    },
-  },
-  pages: {
-    signIn: "/login",
-  },
   logger: {
     error(code, ...message) {
       if (code.name === 'CredentialsSignin') {
-        // Swallow the expected error for invalid credentials
         return;
       }
       console.error(code, ...message);

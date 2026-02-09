@@ -1,6 +1,6 @@
 # Story 1.4: Admin-Led User Provisioning
 
-Status: ready-for-dev
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -22,17 +22,17 @@ so that initial user provisioning is controlled and secure.
 
 ## Tasks / Subtasks
 
-- [ ] **Backend:** Develop the API for user provisioning.
-  - [ ] Create endpoints for creating, reading, updating, and deactivating user accounts.
-  - [ ] Implement role-based access control to ensure only administrators can access these endpoints.
-  - [ ] Add validation to check for unique phone numbers and national codes.
-- [ ] **Frontend:** Build the Admin Panel UI.
-  - [ ] Create a new page for the Admin Panel.
-  - [ ] Design a form for creating new users.
-  - [ ] Display a table or list of existing users with their details.
-  - [ ] Add functionality to edit and deactivate users.
-- [ ] **Integration:** Connect the Admin Panel to the backend API.
-- [ ] **Database:** Update the database schema to include the `created_by` field in the user table.
+- [x] **Backend:** Develop the API for user provisioning.
+  - [x] Create endpoints for creating, reading, updating, and deactivating user accounts.
+  - [x] Implement role-based access control to ensure only administrators can access these endpoints.
+  - [x] Add validation to check for unique phone numbers and national codes.
+- [x] **Frontend:** Build the Admin Panel UI.
+  - [x] Create a new page for the Admin Panel.
+  - [x] Design a form for creating new users.
+  - [x] Display a table or list of existing users with their details.
+  - [x] Add functionality to edit and deactivate users.
+- [x] **Integration:** Connect the Admin Panel to the backend API.
+- [x] **Database:** Update the database schema to include the `created_by` field in the user table (Already existed).
 
 ## Dev Notes
 
@@ -42,7 +42,7 @@ so that initial user provisioning is controlled and secure.
 
 ### Project Structure Notes
 
-- The Admin Panel will be a new feature, so a new directory `src/features/admin` will be created.
+- The Admin Panel will be a new feature, so a new directory `src/features/admin` (Used `src/app/admin`) will be created.
 - The API endpoints will be added to a new tRPC router in `src/server/routers/admin.ts`.
 - The database schema in `src/lib/db.ts` will be modified to include the `created_by` field.
 
@@ -54,10 +54,27 @@ so that initial user provisioning is controlled and secure.
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Gemini 2.0 Flash
 
 ### Debug Log References
 
+- Implemented `src/server/routers/admin.ts` with `getUsers`, `createUser`, `updateUser`, `deactivateUser`.
+- Added `adminProcedure` in `src/server/trpc.ts` for RBAC.
+- Registered `adminRouter` in `src/server/index.ts`.
+- Created `src/app/admin/users/page.tsx` and `src/app/admin/users/user-management-view.tsx` matching the mockup layout (List + Form).
+- Implemented full CRUD functionality for admin provisioning including uniqueness checks and error handling.
+
 ### Completion Notes List
 
+- Admin provisioning is fully functional.
+- Uniqueness for National Code and Phone Number is enforced.
+- UI matches the mockup with Tailwind CSS.
+- Edit and Deactivate functionalities are implemented.
+
 ### File List
+
+- src/server/routers/admin.ts
+- src/server/trpc.ts
+- src/server/index.ts
+- src/app/admin/users/page.tsx
+- src/app/admin/users/user-management-view.tsx
