@@ -1,11 +1,22 @@
 
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
-require('dotenv').config();
+const dotenv = require('dotenv');
+const path = require('path');
+
+// Explicitly load .env.local from the project root
+const envLocalPath = path.resolve(process.cwd(), '.env.local');
+const resultLocal = dotenv.config({ path: envLocalPath });
+
+if (resultLocal.error) {
+  // .env.local not found, try .env
+  dotenv.config();
+}
 
 async function seed() {
   if (!process.env.DATABASE_URL) {
-    console.error('DATABASE_URL is not defined');
+    console.error('DATABASE_URL is not defined. Please check your .env.local or .env file.');
+    console.log('Current working directory:', process.cwd());
     process.exit(1);
   }
 
@@ -14,11 +25,6 @@ async function seed() {
   });
 
   const passwordHash = await bcrypt.hash('password123', 10);
-
-  // UUID generation in SQL if pgcrypto/uuid-ossp is not available or handled by defaultRandom()
-  // But standard postgres usually needs `gen_random_uuid()` (v13+) or extension.
-  // We'll rely on the default value if we can, or generate one in JS.
-  // Ideally, we just INSERT and let the default handle it.
 
   const client = await pool.connect();
 
@@ -39,15 +45,19 @@ async function seed() {
                 password_hash,
                 role,
                 full_name,
-                resource_type
-            ) VALUES ($1, $2, $3, $4, $5, $6)
+                resource_type,
+                totp_enabled,
+                fhir_data
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         `, [
             '1234567890',
             '09123456789',
             passwordHash,
             'doctor',
             'Dr. Test User',
-            'Practitioner'
+            'Practitioner',
+            false,
+            '{}'
         ]);
         console.log('Seed user created successfully');
     }
