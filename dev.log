@@ -384,3 +384,46 @@ https://nextjs.org/docs/messages/module-not-found
 
 
 ✓ Compiled in 42ms
+✓ Compiled in 1388ms
+⨯ ./src/lib/auth.ts:8:1
+Module not found: Can't resolve 'otplib'
+[0m [90m  6 |[39m [36mimport[39m bcrypt [36mfrom[39m [32m"bcrypt"[39m[33m;[39m
+ [90m  7 |[39m [36mimport[39m { z } [36mfrom[39m [32m"zod"[39m[33m;[39m
+[31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { authenticator } [36mfrom[39m [32m"otplib"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  9 |[39m
+ [90m 10 |[39m [36mconst[39m signInSchema [33m=[39m z[33m.[39mobject({
+ [90m 11 |[39m   identifier[33m:[39m z[33m.[39mstring()[33m,[39m[0m
+
+
+
+Import trace:
+  Server Component:
+    ./src/lib/auth.ts
+    ./src/app/(auth)/login/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+⨯ ./src/lib/auth.ts:8:1
+Module not found: Can't resolve 'otplib'
+[0m [90m  6 |[39m [36mimport[39m bcrypt [36mfrom[39m [32m"bcrypt"[39m[33m;[39m
+ [90m  7 |[39m [36mimport[39m { z } [36mfrom[39m [32m"zod"[39m[33m;[39m
+[31m[1m>[22m[39m[90m  8 |[39m [36mimport[39m { authenticator } [36mfrom[39m [32m"otplib"[39m[33m;[39m
+ [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m  9 |[39m
+ [90m 10 |[39m [36mconst[39m signInSchema [33m=[39m z[33m.[39mobject({
+ [90m 11 |[39m   identifier[33m:[39m z[33m.[39mstring()[33m,[39m[0m
+
+
+
+Import trace:
+  Server Component:
+    ./src/lib/auth.ts
+    ./src/app/(auth)/login/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+✓ Compiled in 400ms
+✓ Compiled in 293ms
