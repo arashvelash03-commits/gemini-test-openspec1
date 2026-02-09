@@ -157,74 +157,115 @@ To ensure consistency, especially when AI agents are involved in development, th
 *   **Strict Boundary (`lib/db` vs `lib/powersync`):** We strictly separate Server-Side Database code (Postgres) from Client-Side Database code (SQLite). Importing Server code into Client components will cause build failures.
 *   **Feature-Based UI:** Smart business logic lives in `components/features`, while reusable primitives live in `components/ui`.
 *   **Modal-First Workflow:** "Create" actions (e.g., Register Patient) are handled via Modals (triggered from the Layout) rather than separate pages, preserving the user's context in the dashboard.
+* **App Router Only:** All routes must be defined in `src/app`. The `pages/` directory is STRICTLY FORBIDDEN.
+* **API Routes:** All API endpoints must use the `route.ts` convention (e.g., `src/app/api/trpc/[trpc]/route.ts`).
+* **Layouts:** Use `layout.tsx` for shared UI (sidebars, headers) as defined in the structure below.
 
 ### 5.2. Complete Project Directory Structure
 
 ```text
 gemini-test/
 ├── src/
-│   ├── app/                        # Next.js App Router
-│   │   ├── (auth)/                 # Login Pages
+│   ├── app/                            # Next.js App Router ONLY
+│   │   ├── (auth)/                     # Route Group: Auth Pages
 │   │   │   ├── login/
+│   │   │   │   └── page.tsx
 │   │   │   └── register/
+│   │   │       └── page.tsx
 │   │   │
-│   │   ├── (clerk)/                # === CLERK WORKFLOW ===
-│   │   │   ├── layout.tsx          # Shared Sidebar (contains Create Patient Modal trigger)
-│   │   │   ├── dashboard/          # "My Tasks" / Queue
-│   │   │   ├── schedule/           # Session Management (Drag & Drop)
+│   │   ├── (admin)/                    # === ADMIN WORKFLOW (Story 1.1) ===
+│   │   │   ├── layout.tsx              # Admin Sidebar & Guard
+│   │   │   ├── dashboard/              # Stats Overview
+│   │   │   │   └── page.tsx
+│   │   │   └── users/                  # User Management (Doctors/Clerks)
+│   │   │       └── page.tsx
+│   │   │
+│   │   ├── (clerk)/                    # === CLERK WORKFLOW ===
+│   │   │   ├── layout.tsx              # Shared Sidebar (contains Create Patient Modal trigger)
+│   │   │   ├── dashboard/              # "My Tasks" / Queue
+│   │   │   │   └── page.tsx
+│   │   │   ├── schedule/               # Session Management
+│   │   │   │   └── page.tsx
 │   │   │   └── patient/
-│   │   │       └── [id]/           # The "Medical Record" View (Uploads)
+│   │   │       └── [id]/               # The "Medical Record" View
+│   │   │           └── page.tsx
 │   │   │
-│   │   ├── (doctor)/               # === DOCTOR WORKFLOW ===
-│   │   │   ├── layout.tsx          # Doctor Sidebar (Timeline Nav)
-│   │   │   ├── dashboard/          # Real-time Queue
+│   │   ├── (doctor)/                   # === DOCTOR WORKFLOW ===
+│   │   │   ├── layout.tsx              # Doctor Sidebar (Timeline Nav)
+│   │   │   ├── dashboard/              # Real-time Queue
+│   │   │   │   └── page.tsx
 │   │   │   └── patient/
-│   │   │       └── [id]/           # The "Timeline" View & Care Plan
+│   │   │       └── [id]/               # The "Timeline" View
+│   │   │           └── page.tsx
 │   │   │
-│   │   ├── (portal)/               # === PATIENT PORTAL ===
+│   │   ├── (portal)/                   # === PATIENT PORTAL ===
 │   │   │   ├── layout.tsx
-│   │   │   ├── dashboard/
-│   │   │   └── documents/
+│   │   │   └── dashboard/
+│   │   │       └── page.tsx
 │   │   │
-│   │   ├── api/                    # Server Entrypoints
+│   │   ├── api/                        # Server Entrypoints
 │   │   │   ├── auth/[...nextauth]/
-│   │   │   ├── trpc/[trpc]/        # API Gateway
-│   │   │   └── webhooks/           # SMS/Sync Webhooks
+│   │   │   │   └── route.ts            # NextAuth Handler
+│   │   │   ├── trpc/[trpc]/
+│   │   │   │   └── route.ts            # <--- FIXED: Must be route.ts for App Router
+│   │   │   └── webhooks/
+│   │   │       └── route.ts            # SMS/Sync Webhooks
 │   │   │
-│   │   └── layout.tsx              # Root Providers (PowerSync, Auth)
+│   │   └── layout.tsx                  # Root Providers (PowerSync, Auth, TRPCProvider)
 │   │
-│   ├── components/                 # UI Components
-│   │   ├── ui/                     # Primitives (Button, Input)
-│   │   ├── layout/                 # Sidebar, UserMenu
-│   │   └── features/               # === SMART COMPONENTS ===
-│   │       ├── patients/
-│   │       │   └── RegisterPatientDialog.tsx  # Modal (No separate page needed)
-│   │       ├── timeline/
-│   │       │   ├── EventCard.tsx
-│   │       │   └── PatientSummaryCard.tsx
-│   │       ├── schedule/
-│   │       │   ├── SessionGenerator.ts        # Logic for Epic 3.5
-│   │       │   └── DragDropCalendar.tsx
-│   │       └── operations/
+│   ├── features/                       # === FEATURE MODULES (Logic + UI) ===
+│   │   ├── admin/                      # Admin specific components
+│   │   │   ├── components/
+│   │   │   │   ├── UserForm.tsx
+│   │   │   │   └── UserListTable.tsx
+│   │   │   └── hooks/                  # Admin specific hooks
+│   │   ├── patients/
+│   │   │   └── components/
+│   │   │       └── RegisterPatientDialog.tsx
+│   │   ├── timeline/
+│   │   │   └── components/
+│   │   │       ├── EventCard.tsx
+│   │   │       └── PatientSummaryCard.tsx
+│   │   ├── schedule/
+│   │   │   ├── logic/
+│   │   │   │   └── SessionGenerator.ts # Logic for Epic 3.5
+│   │   │   └── components/
+│   │   │       └── DragDropCalendar.tsx
+│   │   └── operations/                 # Cross-cutting operational features
+│   │       └── components/
 │   │           └── NotificationToast.tsx
 │   │
-│   ├── lib/                        # Infrastructure
-│   │   ├── db/                     # === SERVER-SIDE (Postgres) ===
-│   │   │   ├── schema.ts           # Drizzle/Prisma Schema
-│   │   │   └── index.ts
+│   ├── components/                     # Shared / Generic UI
+│   │   ├── ui/                         # Primitives (Button, Input, Table - from Shadcn/MUI)
+│   │   └── layout/                     # Structural (Sidebar, Header, UserMenu)
+│   │
+│   ├── lib/                            # Infrastructure & Configuration
+│   │   ├── db/                         # === SERVER-SIDE DB (Postgres) ===
+│   │   │   ├── schema.ts               # Drizzle Schema Definitions
+│   │   │   ├── drizzle.ts              # Drizzle Client Instance
+│   │   │   └── migrations/             # SQL Migrations
 │   │   │
-│   │   └── powersync/              # === CLIENT-SIDE (SQLite) ===
-│   │       ├── AppSchema.ts        # Offline Schema Definition
-│   │       ├── db.ts
-│   │       └── mutations/          # Offline Write Queue
+│   │   ├── powersync/                  # === CLIENT-SIDE DB (SQLite) ===
+│   │   │   ├── AppSchema.ts            # Offline Schema Definition
+│   │   │   ├── db.ts                   # PowerSync Client Instance
+│   │   │   └── mutations/              # Offline Write Queue
+│   │   │
+│   │   └── trpc/                       # tRPC Configuration
+│   │       ├── client.ts               # Client-side hooks
+│   │       └── server.ts               # Server-side caller
 │   │
-│   ├── server/                     # Backend Logic
-│   │   ├── routers/                # tRPC Routers (API Boundary)
-│   │   └── services/               # Heavy Logic (SMS, Scheduler)
+│   ├── server/                         # Backend Business Logic
+│   │   ├── routers/                    # tRPC Routers (API Boundary)
+│   │   │   ├── app.ts                  # Root Router
+│   │   │   ├── admin.ts                # Story 1.1 Router
+│   │   │   ├── patients.ts
+│   │   │   └── schedule.ts
+│   │   ├── context.ts                  # tRPC Context (Auth, DB)
+│   │   └── services/                   # Heavy Logic (SMS, Scheduler)
 │   │
-│   └── types/                      # Shared TypeScript Definitions
-│       ├── db.ts
-│       └── fhir.ts
+│   └── types/                          # Shared TypeScript Definitions
+│       ├── db.ts                       # Inferred Drizzle Types
+│       └── fhir.ts                     # FHIR Compliance Types
 ```
 
 ### 5.3. Architectural Boundaries
@@ -248,6 +289,7 @@ To ensure interoperability and AI-readiness, the project enforces a **"FHIR-Firs
 *   **Immutable Records & Soft Deletes:** Records are never physically deleted from the database. A `deleted_at` timestamp will be used to mark records as deleted. This ensures that deletions can be synced to other clients.
 *   **Timestamps for Conflict Resolution:** All tables will have `created_at` and `updated_at` timestamps. These will be used by the system, in combination with PowerSync's internal mechanisms, to resolve conflicts. The default strategy will be "Last Write Wins" based on the `updated_at` timestamp.
 *   **Data Partitioning for Sync Rules:** The schema will include columns (e.g., `user_id`, `patient_id`) to facilitate PowerSync's "Sync Rules". This ensures that clients only download the data they are authorized to access.
+
 
 ## 6. Architecture Validation Results
 
