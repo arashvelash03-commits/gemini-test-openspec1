@@ -22,46 +22,64 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         totpCode: { label: "TOTP Code", type: "text" },
       },
       authorize: async (credentials) => {
-        const { identifier, password, totpCode } = await signInSchema.parseAsync(credentials);
+        console.log("Authorize called with identifier:", credentials?.identifier);
 
-        const user = await db.query.users.findFirst({
-          where: or(
-            eq(users.phoneNumber, identifier),
-            eq(users.nationalCode, identifier)
-          ),
-        });
+        try {
+          const { identifier, password, totpCode } = await signInSchema.parseAsync(credentials);
 
-        if (!user || !user.passwordHash) {
-          return null;
-        }
+          const user = await db.query.users.findFirst({
+            where: or(
+              eq(users.phoneNumber, identifier),
+              eq(users.nationalCode, identifier)
+            ),
+          });
 
-        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
-
-        if (!passwordMatch) {
-          return null;
-        }
-
-        if (user.totpEnabled) {
-          if (!totpCode) {
-            throw new Error("TOTP_REQUIRED");
+          if (!user) {
+            console.log("User not found for identifier:", identifier);
+            return null;
           }
 
-          if (!user.totpSecret) {
-             // Should not happen if enabled is true, but safe guard
-             throw new Error("TOTP_SETUP_ERROR");
+          if (!user.passwordHash) {
+             console.log("User has no password hash");
+             return null;
           }
 
-          const isValidTotp = authenticator.check(totpCode, user.totpSecret);
-          if (!isValidTotp) {
-            throw new Error("INVALID_TOTP");
+          const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+
+          if (!passwordMatch) {
+            console.log("Password mismatch");
+            return null;
           }
+
+          if (user.totpEnabled) {
+            console.log("TOTP enabled for user");
+            if (!totpCode) {
+              console.log("TOTP code missing, throwing TOTP_REQUIRED");
+              throw new Error("TOTP_REQUIRED");
+            }
+
+            if (!user.totpSecret) {
+               console.log("TOTP enabled but secret missing");
+               throw new Error("TOTP_SETUP_ERROR");
+            }
+
+            const isValidTotp = authenticator.check(totpCode, user.totpSecret);
+            if (!isValidTotp) {
+              console.log("Invalid TOTP code");
+              throw new Error("INVALID_TOTP");
+            }
+          }
+
+          console.log("User authenticated successfully:", user.id);
+          return {
+            id: user.id,
+            name: user.fullName, // Mapping fullName to name
+            role: user.role,
+          };
+        } catch (error) {
+          console.error("Authorize error:", error);
+          throw error; // Re-throw to let NextAuth handle it (or masking it)
         }
-
-        return {
-          id: user.id,
-          name: user.fullName, // Mapping fullName to name
-          role: user.role,
-        };
       },
     }),
   ],
