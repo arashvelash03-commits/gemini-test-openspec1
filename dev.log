@@ -358,3 +358,5 @@ Authorize called for 2222222222. TOTP Code: '959126' (type: string)
  GET /api/trpc/profile.getProfile?batch=1&input=%7B%7D 404 in 61ms (compile: 39ms, render: 22ms)
 ✓ Compiled in 51ms
 ✓ Compiled in 48ms
+  Reload env: .env
+  Reload env: .env.local
