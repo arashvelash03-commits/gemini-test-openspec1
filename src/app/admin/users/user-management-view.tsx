@@ -2,10 +2,17 @@
 
 import { useState } from "react";
 import { trpc } from "@/app/_trpc/client";
-import { useRouter } from "next/navigation";
+
+interface User {
+  id: string;
+  fullName: string | null;
+  nationalCode: string;
+  phoneNumber: string | null;
+  role: "admin" | "doctor" | "clerk" | "patient";
+  status: "active" | "inactive" | "error" | null;
+}
 
 export default function UserManagementView() {
-  const router = useRouter();
   const [formData, setFormData] = useState({
     fullName: "",
     nationalCode: "",
@@ -18,57 +25,51 @@ export default function UserManagementView() {
   const [success, setSuccess] = useState("");
 
   const utils = trpc.useUtils();
-  const usersQuery = trpc.admin.getUsers.useQuery();
 
   const createUserMutation = trpc.admin.createUser.useMutation({
     onSuccess: () => {
       setSuccess("کاربر با موفقیت ایجاد شد");
+      setError("");
       resetForm();
       utils.admin.getUsers.invalidate();
-      setTimeout(() => setSuccess(""), 3000);
     },
     onError: (err) => {
       setError(err.message);
-      setTimeout(() => setError(""), 5000);
+      setSuccess("");
     },
   });
 
   const updateUserMutation = trpc.admin.updateUser.useMutation({
     onSuccess: () => {
-        setSuccess("اطلاعات کاربر با موفقیت ویرایش شد");
-        resetForm();
-        utils.admin.getUsers.invalidate();
-        setTimeout(() => setSuccess(""), 3000);
+      setSuccess("اطلاعات کاربر بروزرسانی شد");
+      setError("");
+      resetForm();
+      utils.admin.getUsers.invalidate();
     },
     onError: (err) => {
-        setError(err.message);
-        setTimeout(() => setError(""), 5000);
-    }
+      setError(err.message);
+      setSuccess("");
+    },
   });
 
   const deactivateUserMutation = trpc.admin.deactivateUser.useMutation({
       onSuccess: () => {
           utils.admin.getUsers.invalidate();
-      },
-      onError: (err) => {
-          alert("خطا در غیرفعال‌سازی کاربر: " + err.message);
       }
   });
 
-  const resetForm = () => {
-      setFormData({
-        fullName: "",
-        nationalCode: "",
-        phoneNumber: "",
-        role: "doctor",
-        password: "",
-      });
-      setEditingId(null);
-      setError("");
-  };
+  const usersQuery = trpc.admin.getUsers.useQuery({});
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (!formData.fullName || !formData.nationalCode || !formData.phoneNumber) {
+      setError("لطفا تمام فیلدها را پر کنید");
+      return;
+    }
+
     if (editingId) {
         updateUserMutation.mutate({
             id: editingId,
@@ -77,70 +78,83 @@ export default function UserManagementView() {
             phoneNumber: formData.phoneNumber,
         });
     } else {
-        if (!formData.fullName || !formData.nationalCode || !formData.phoneNumber || !formData.password) {
-            setError("لطفا همه فیلدها را پر کنید");
+        if (!formData.password) {
+            setError("کلمه عبور الزامی است");
             return;
         }
-        createUserMutation.mutate(formData);
+        createUserMutation.mutate({
+            fullName: formData.fullName,
+            nationalCode: formData.nationalCode,
+            phoneNumber: formData.phoneNumber,
+            role: formData.role,
+            password: formData.password,
+        });
     }
   };
 
-  return (
-    <div className="flex flex-1 overflow-hidden h-screen bg-slate-50">
-      {/* Users List Section (Right side in RTL) */}
-      <section className="w-full md:w-[65%] flex flex-col bg-slate-50 border-l border-slate-200 h-full">
-        <div className="p-6 pb-2 flex justify-between items-center bg-white border-b border-slate-200">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900">کاربران فعال</h2>
-            <p className="text-xs text-slate-500 mt-1">لیست تمامی پزشکان و کارکنان دارای دسترسی</p>
-          </div>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
-            <input
-              className="pr-9 pl-4 py-2 bg-white border border-slate-200 rounded-lg text-xs w-64 focus:ring-primary focus:border-primary outline-none"
-              placeholder="جستجوی نام یا کد ملی..."
-              type="text"
-            />
-          </div>
-        </div>
+  const handleEdit = (user: User) => {
+      setEditingId(user.id);
+      setFormData({
+          fullName: user.fullName || "",
+          nationalCode: user.nationalCode,
+          phoneNumber: user.phoneNumber || "",
+          role: user.role === "doctor" || user.role === "clerk" ? user.role : "doctor", // Default to doctor if role is not editable/supported in form
+          password: "", // Password not filled
+      });
+      setError("");
+      setSuccess("");
+  };
 
-        <div className="flex-1 overflow-y-auto p-6 pt-4 custom-scrollbar space-y-3">
-            {usersQuery.isLoading ? (
-                <div className="text-center py-10 text-slate-500">در حال بارگذاری...</div>
-            ) : usersQuery.data?.length === 0 ? (
-                <div className="text-center py-10 text-slate-500">کاربری یافت نشد.</div>
-            ) : (
-                usersQuery.data?.map((user) => (
-                    <div key={user.id} className={`p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between ${user.status === 'inactive' ? 'bg-slate-100 opacity-75 grayscale' : 'bg-white'}`}>
+  const resetForm = () => {
+      setEditingId(null);
+      setFormData({
+        fullName: "",
+        nationalCode: "",
+        phoneNumber: "",
+        role: "doctor",
+        password: "",
+      });
+  };
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
+      {/* Users List Section (Right side in RTL) */}
+      <section className="flex-1 p-8 overflow-y-auto">
+        <header className="mb-8">
+            <h1 className="text-3xl font-bold text-slate-900 mb-2">مدیریت کاربران</h1>
+            <p className="text-slate-500">مشاهده و مدیریت دسترسی‌های پرسنل سامانه</p>
+        </header>
+
+        {usersQuery.isLoading && <div className="text-center py-12 text-slate-500">در حال بارگذاری لیست کاربران...</div>}
+        {usersQuery.isError && <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">خطا در دریافت لیست کاربران</div>}
+
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {usersQuery.data && (
+                usersQuery.data.map((user) => (
+                    <div key={user.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between group">
                         <div className="flex items-center gap-4">
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${user.role === 'doctor' ? 'bg-emerald-50 text-emerald-600' : 'bg-blue-50 text-blue-600'}`}>
-                                <span className="material-symbols-outlined">{user.role === 'doctor' ? 'medical_services' : 'badge'}</span>
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold
+                                ${user.role === 'admin' ? 'bg-purple-100 text-purple-600' :
+                                  user.role === 'doctor' ? 'bg-blue-100 text-blue-600' :
+                                  'bg-slate-100 text-slate-600'}`}
+                            >
+                                {user.fullName ? user.fullName[0] : "?"}
                             </div>
                             <div>
-                                <div className="flex items-center gap-2">
-                                    <h3 className="font-bold text-slate-800">{user.fullName}</h3>
-                                    <span className={`px-2 py-0.5 text-[10px] rounded-full font-bold ${user.role === 'doctor' ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
-                                        {user.role === 'doctor' ? 'پزشک' : 'منشی'}
+                                <h3 className="font-bold text-slate-900">{user.fullName || "نامشخص"}</h3>
+                                <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
+                                    <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-100 font-numbers">{user.nationalCode}</span>
+                                    <span className="flex items-center gap-1">
+                                        <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></span>
+                                        {user.role === 'doctor' ? 'پزشک' : user.role === 'clerk' ? 'منشی' : user.role === 'admin' ? 'مدیر' : user.role}
                                     </span>
-                                    {user.status === 'inactive' && <span className="px-2 py-0.5 bg-red-100 text-red-700 text-[10px] rounded-full font-bold">غیرفعال</span>}
                                 </div>
-                                <p className="text-xs text-slate-500 font-numbers mt-1">کد ملی: {user.nationalCode} • همراه: {user.phoneNumber}</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                                onClick={() => {
-                                    setEditingId(user.id);
-                                    setFormData({
-                                        fullName: user.fullName || "",
-                                        nationalCode: user.nationalCode,
-                                        phoneNumber: user.phoneNumber || "",
-                                        role: user.role as "doctor" | "clerk",
-                                        password: "",
-                                    });
-                                    setError("");
-                                }}
-                                className="flex items-center gap-1 px-3 py-1.5 text-slate-600 hover:bg-slate-100 rounded-lg transition-colors text-xs font-medium border border-slate-100"
+                                onClick={() => handleEdit(user as User)}
+                                className="flex items-center gap-1 px-3 py-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors text-xs font-medium border border-slate-100"
                             >
                                 <span className="material-symbols-outlined text-sm">edit</span>
                                 ویرایش

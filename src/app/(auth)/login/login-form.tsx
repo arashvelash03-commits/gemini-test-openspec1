@@ -28,7 +28,6 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData);
 
-    // In TOTP mode, we combine the stored credentials with the entered TOTP code
     const submissionData = requireTotp ? {
         ...credentials,
         totpCode: data.totpCode
@@ -45,26 +44,31 @@ export default function LoginForm() {
       const res = await signIn("credentials", {
         identifier: result.data.identifier,
         password: result.data.password,
-        totpCode: result.data.totpCode || undefined,
+        ...(result.data.totpCode ? { totpCode: result.data.totpCode } : {}),
         redirect: false,
       });
 
       if (res?.error) {
-        // Simple string check for the error message
-        if (res.error.includes("TOTP_REQUIRED") || res.code === "TOTP_REQUIRED") {
+        const errorMsg = res.error;
+        const errorCode = res.code;
+
+        if (errorMsg.includes("TOTP_REQUIRED") || errorCode === "TOTP_REQUIRED") {
             setRequireTotp(true);
             setCredentials({
                 identifier: result.data.identifier as string,
                 password: result.data.password as string,
             });
-            setError(""); // Clear previous error
-        } else if (res.error.includes("INVALID_TOTP")) {
+            setError("");
+        } else if (errorMsg.includes("INVALID_TOTP") || errorCode === "INVALID_TOTP") {
             setError("کد تایید اشتباه است");
+        } else if (errorMsg === "Configuration") {
+             // Fallback for configuration errors (masked by NextAuth sometimes)
+            setError("خطای سیستم. لطفا مجددا تلاش کنید.");
         } else {
             setError("اطلاعات وارد شده صحیح نمی‌باشد");
         }
       } else {
-        router.push("/dashboard");
+        router.push("/");
         router.refresh();
       }
     } catch (err) {
@@ -76,7 +80,6 @@ export default function LoginForm() {
   }
 
   const handleTotpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // Limit to 6 digits
       const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 6);
       e.target.value = val;
   };
@@ -101,7 +104,7 @@ export default function LoginForm() {
           <div className="p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-xl text-center border border-red-100">
+                <div id="error-message" className="p-3 text-sm text-red-500 bg-red-50 rounded-xl text-center border border-red-100">
                   {error}
                 </div>
               )}
@@ -109,21 +112,15 @@ export default function LoginForm() {
               {!requireTotp ? (
               <>
               <div className="space-y-2">
-                <label
-                  className="text-sm font-semibold text-slate-700 block mr-1"
-                  htmlFor="identifier"
-                >
+                <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="identifier">
                   شماره همراه یا کد ملی
                 </label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-                    person
-                  </span>
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
                   <input
                     className="w-full h-12 pr-11 pl-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 focus:outline-none"
                     id="identifier"
                     name="identifier"
-                    placeholder="مثلا: ۰۹۱۲۳۴۵۶۷۸۹"
                     type="text"
                     disabled={loading}
                     autoFocus
@@ -131,21 +128,15 @@ export default function LoginForm() {
                 </div>
               </div>
               <div className="space-y-2">
-                <label
-                  className="text-sm font-semibold text-slate-700 block mr-1"
-                  htmlFor="password"
-                >
+                <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="password">
                   کلمه عبور
                 </label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-                    lock
-                  </span>
+                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
                   <input
                     className="w-full h-12 pr-11 pl-11 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 focus:outline-none"
                     id="password"
                     name="password"
-                    placeholder="••••••••"
                     type={showPassword ? "text" : "password"}
                     disabled={loading}
                   />
@@ -163,22 +154,15 @@ export default function LoginForm() {
               </>
               ) : (
                 <div className="space-y-2">
-                  <label
-                    className="text-sm font-semibold text-slate-700 block mr-1"
-                    htmlFor="totpCode"
-                  >
+                  <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="totpCode">
                     کد تایید
                   </label>
                   <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
-                      key
-                    </span>
+                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">key</span>
                     <input
                       className="w-full h-12 pr-11 pl-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 focus:outline-none text-center tracking-[1em] text-lg font-bold"
                       id="totpCode"
                       name="totpCode"
-                      placeholder="------"
-                      type="text"
                       maxLength={6}
                       disabled={loading}
                       autoFocus
@@ -194,11 +178,6 @@ export default function LoginForm() {
                 disabled={loading}
               >
                 <span>{loading ? "در حال پردازش..." : (requireTotp ? "تایید و ورود" : "ورود")}</span>
-                {!loading && (
-                  <span className="material-symbols-outlined text-[20px]">
-                    {requireTotp ? "check_circle" : "login"}
-                  </span>
-                )}
               </button>
 
               {requireTotp && (
