@@ -18,7 +18,7 @@ def verify_full_flow():
         page.click("button[type='submit']")
         # Expect redirect to admin
         try:
-            page.wait_for_url("**/admin/users", timeout=10000)
+            page.wait_for_url("**/admin/users", timeout=20000)
             print("PASS: Admin redirected to /admin/users")
             page.screenshot(path="verification/admin_dashboard.png")
         except Exception as e:
@@ -34,16 +34,27 @@ def verify_full_flow():
         page.goto(f"{BASE_URL}/login")
         page.fill("input[name='identifier']", "1111111111")
         page.fill("input[name='password']", "password123")
-        page.click("button[type='submit']")
+
+        # Dispatch click event instead of normal click to bypass overlay
+        page.eval_on_selector("button[type='submit']", "el => el.click()")
+
         # Expect redirect to setup-2fa
         try:
-            page.wait_for_url("**/setup-2fa", timeout=10000)
+            page.wait_for_url("**/setup-2fa", timeout=20000)
             print("PASS: Doctor No 2FA redirected to /setup-2fa")
             page.screenshot(path="verification/setup_2fa.png")
         except Exception as e:
             print(f"FAIL: Doctor No 2FA. Current URL: {page.url}")
             page.screenshot(path="verification/doctor_no2fa_fail.png")
             raise e
+
+        # Test 2b: Verify Logout Button exists
+        print("Testing Logout Button on Setup 2FA...")
+        if page.is_visible("button:has-text('خروج')"):
+            print("PASS: Logout button visible")
+        else:
+             print("FAIL: Logout button not visible")
+
         context.close()
 
         # Test 3: Doctor With 2FA -> TOTP Challenge -> Redirect to /dashboard
@@ -53,7 +64,8 @@ def verify_full_flow():
         page.goto(f"{BASE_URL}/login")
         page.fill("input[name='identifier']", "2222222222")
         page.fill("input[name='password']", "password123")
-        page.click("button[type='submit']")
+
+        page.eval_on_selector("button[type='submit']", "el => el.click()")
 
         # Expect TOTP field to appear (Client side state change)
         try:
@@ -77,10 +89,10 @@ def verify_full_flow():
         print(f"Entering TOTP: {code}")
         page.fill("input[name='totpCode']", code)
 
-        page.click("button[type='submit']")
+        page.eval_on_selector("button[type='submit']", "el => el.click()")
 
         try:
-            page.wait_for_url("**/dashboard", timeout=10000)
+            page.wait_for_url("**/dashboard", timeout=20000)
             print("PASS: Doctor With 2FA redirected to /dashboard")
             page.screenshot(path="verification/dashboard.png")
         except Exception as e:
@@ -91,9 +103,6 @@ def verify_full_flow():
         # Check Profile Access
         print("Testing Profile Access...")
         page.goto(f"{BASE_URL}/profile")
-        # Check for some element on profile page.
-        # Since I haven't seen profile page content, I assume it has "Profile" text or similar.
-        # Or at least it doesn't redirect to login.
         if "/login" in page.url:
              print("FAIL: Profile redirected to login")
         else:

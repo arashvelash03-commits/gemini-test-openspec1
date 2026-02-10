@@ -360,3 +360,43 @@ Authorize called for 2222222222. TOTP Code: '959126' (type: string)
 ✓ Compiled in 48ms
   Reload env: .env
   Reload env: .env.local
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 4.7s (compile: 915ms, proxy.ts: 1007ms, render: 2.8s)
+ GET /api/auth/providers 200 in 2.7s (compile: 2.6s, render: 38ms)
+ GET /api/auth/csrf 200 in 18ms (compile: 6ms, render: 12ms)
+ POST /api/auth/callback/credentials? 200 in 79ms (compile: 6ms, render: 72ms)
+[Middleware] Path: /, LoggedIn: true, Public: false
+[Middleware] Path: /admin/users, LoggedIn: true, Public: false
+ GET /admin/users 200 in 1067ms (compile: 782ms, proxy.ts: 19ms, render: 266ms)
+[Middleware] Path: /admin/users, LoggedIn: true, Public: false
+ GET /admin/users 200 in 81ms (compile: 6ms, proxy.ts: 30ms, render: 45ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 360ms (compile: 11ms, proxy.ts: 23ms, render: 326ms)
+⨯ ./src/server/routers/admin.ts:1:1
+Export protectedProcedure doesn't exist in target module
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { router[33m,[39m protectedProcedure } [36mfrom[39m [32m"../trpc"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 2 |[39m [36mimport[39m { z } [36mfrom[39m [32m"zod"[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m { db } [36mfrom[39m [32m"@/lib/db"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { users } [36mfrom[39m [32m"@/lib/db/schema"[39m[33m;[39m[0m
+
+The export protectedProcedure was not found in module [project]/src/server/trpc.ts [app-route] (ecmascript).
+Did you mean to import router?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  App Route:
+    ./src/server/routers/admin.ts
+    ./src/server/index.ts
+    ./src/app/api/trpc/[trpc]/route.ts
+
+
+○ Compiling /_error ...
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 149ms (compile: 8ms, proxy.ts: 14ms, render: 126ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 95ms (compile: 8ms, proxy.ts: 7ms, render: 80ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 142ms (compile: 5ms, proxy.ts: 7ms, render: 130ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 95ms (compile: 4ms, proxy.ts: 7ms, render: 84ms)
