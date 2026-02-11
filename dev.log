@@ -400,3 +400,5 @@ Import trace:
  GET /login 200 in 142ms (compile: 5ms, proxy.ts: 7ms, render: 130ms)
 [Middleware] Path: /login, LoggedIn: false, Public: true
  GET /login 200 in 95ms (compile: 4ms, proxy.ts: 7ms, render: 84ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 993ms (compile: 95ms, proxy.ts: 298ms, render: 600ms)

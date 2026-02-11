@@ -1,22 +1,17 @@
-import { publicProcedure, router } from "../trpc";
+import { protectedProcedure, router } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import { eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { authenticator } from "otplib";
 import QRCode from "qrcode";
 import { TRPCError } from "@trpc/server";
 
 export const totpRouter = router({
-  generateTotpSecret: publicProcedure
-    .input(z.object({ identifier: z.string() }))
-    .mutation(async ({ input }) => {
-      const { identifier } = input;
+  generateTotpSecret: protectedProcedure
+    .mutation(async ({ ctx }) => {
       const user = await db.query.users.findFirst({
-        where: or(
-          eq(users.phoneNumber, identifier),
-          eq(users.nationalCode, identifier)
-        ),
+        where: eq(users.id, ctx.session.user.id),
       });
 
       if (!user) {
@@ -41,15 +36,12 @@ export const totpRouter = router({
       return { secret, qrCodeUrl };
     }),
 
-  verifyAndEnableTotp: publicProcedure
-    .input(z.object({ identifier: z.string(), token: z.string() }))
-    .mutation(async ({ input }) => {
-      const { identifier, token } = input;
+  verifyAndEnableTotp: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const { token } = input;
       const user = await db.query.users.findFirst({
-        where: or(
-          eq(users.phoneNumber, identifier),
-          eq(users.nationalCode, identifier)
-        ),
+        where: eq(users.id, ctx.session.user.id),
       });
 
       if (!user || !user.totpSecret) {
