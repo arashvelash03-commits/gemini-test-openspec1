@@ -18,22 +18,35 @@ export const totpRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
       }
 
-      const secret = authenticator.generateSecret();
+      if (user.totpEnabled) {
+          // If already enabled, returning null or special status might be better,
+          // but strictly speaking we shouldn't be generating a secret.
+          // For the frontend to handle this gracefully:
+          return { secret: null, qrCodeUrl: null, alreadyEnabled: true };
+      }
+
+      let secret = user.totpSecret;
+
+      // If no secret exists, or if we want to ensure a secret exists for setup
+      if (!secret) {
+          secret = authenticator.generateSecret();
+          // Save secret to DB (enabled=false until verified)
+          await db
+            .update(users)
+            .set({ totpSecret: secret, totpEnabled: false })
+            .where(eq(users.id, user.id));
+      }
+
+      // Re-generate QR code for the (existing or new) secret
       const otpauth = authenticator.keyuri(
-        user.nationalCode, // Use national code as username in Authenticator
+        user.nationalCode,
         "GeminiTest",
         secret
       );
 
-      // Save secret to DB (enabled=false until verified)
-      await db
-        .update(users)
-        .set({ totpSecret: secret, totpEnabled: false })
-        .where(eq(users.id, user.id));
-
       const qrCodeUrl = await QRCode.toDataURL(otpauth);
 
-      return { secret, qrCodeUrl };
+      return { secret, qrCodeUrl, alreadyEnabled: false };
     }),
 
   verifyAndEnableTotp: protectedProcedure

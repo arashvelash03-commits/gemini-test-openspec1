@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 
 export default function Setup2FAForm() {
   const router = useRouter();
-  const { update } = useSession(); // Hook to update session
+  const { update } = useSession();
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -17,7 +17,13 @@ export default function Setup2FAForm() {
   const [loading, setLoading] = useState(false);
 
   const generateMutation = trpc.totp.generateTotpSecret.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
+      // If backend says already enabled, force redirect immediately
+      if (data.alreadyEnabled) {
+          await update({ totpEnabled: true });
+          window.location.href = "/dashboard";
+          return;
+      }
       setQrCodeUrl(data.qrCodeUrl);
       setSecret(data.secret);
     },
@@ -29,10 +35,7 @@ export default function Setup2FAForm() {
 
   const verifyMutation = trpc.totp.verifyAndEnableTotp.useMutation({
     onSuccess: async () => {
-      // Force session update to reflect new TOTP status
       await update({ totpEnabled: true });
-
-      // Force hard refresh to ensure middleware catches new session state
       window.location.href = "/dashboard";
     },
     onError: (err) => {
