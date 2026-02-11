@@ -1,110 +1,81 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 
 interface ProfileData {
-  id: string;
   fullName: string | null;
-  nationalCode: string | null;
+  nationalCode: string;
   phoneNumber: string | null;
-  role: string;
   totpEnabled: boolean | null;
 }
 
 export default function ProfileView() {
   const router = useRouter();
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-
   const [formData, setFormData] = useState({
     fullName: "",
-    phoneNumber: "",
     nationalCode: "",
+    phoneNumber: "",
   });
-
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
   });
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
-  const getProfile = trpc.profile.getProfile.useQuery(undefined, {
-      onSuccess: (data) => {
-          setProfile(data);
-          setFormData({
-              fullName: data.fullName || "",
-              phoneNumber: data.phoneNumber || "",
-              nationalCode: data.nationalCode || "",
-          });
-          setLoading(false);
-      },
-      onError: () => {
-          setError("خطا در دریافت اطلاعات کاربری");
-          setLoading(false);
-      }
+  const profileQuery = trpc.profile.getProfile.useQuery(undefined, {
+      // Don't rely on onSuccess here to set state if possible, as it might flicker or not run on refetch
+      // Better to use useEffect on data change
   });
 
   const updateProfileMutation = trpc.profile.updateProfile.useMutation({
-      onSuccess: () => {
-          setSuccessMessage("اطلاعات با موفقیت ذخیره شد");
-          getProfile.refetch();
-          setTimeout(() => setSuccessMessage(""), 3000);
-      },
-      onError: (err) => {
-          setError("خطا در بروزرسانی اطلاعات: " + err.message);
-      }
+    onSuccess: () => {
+      setSuccessMessage("اطلاعات کاربری با موفقیت بروزرسانی شد");
+      setError("");
+      profileQuery.refetch();
+    },
+    onError: (err) => {
+      setError(err.message);
+      setSuccessMessage("");
+    },
   });
 
   const changePasswordMutation = trpc.profile.changePassword.useMutation({
-      onSuccess: () => {
-          setSuccessMessage("کلمه عبور با موفقیت تغییر کرد");
-          setPasswordData({ currentPassword: "", newPassword: "" });
-          setTimeout(() => setSuccessMessage(""), 3000);
-      },
-      onError: (err) => {
-          setError("خطا در تغییر کلمه عبور: " + err.message);
-      }
+    onSuccess: () => {
+      setSuccessMessage("کلمه عبور با موفقیت تغییر کرد");
+      setError("");
+      setPasswordData({ currentPassword: "", newPassword: "" });
+    },
+    onError: (err) => {
+      setError(err.message);
+      setSuccessMessage("");
+    },
   });
 
   const reset2FAMutation = trpc.profile.reset2FA.useMutation({
       onSuccess: () => {
-          setSuccessMessage("تنظیمات 2FA با موفقیت بازنشانی شد. لطفا مجددا تنظیم کنید.");
-          getProfile.refetch();
-          setTimeout(() => {
-              setSuccessMessage("");
-              router.push("/setup-2fa");
-          }, 2000);
-      },
-      onError: (err) => {
-          setError("خطا در بازنشانی 2FA: " + err.message);
+          setSuccessMessage("تنظیمات 2FA بازنشانی شد");
+          profileQuery.refetch();
       }
   });
 
-  const handleProfileUpdate = (e: React.FormEvent) => {
-      e.preventDefault();
-      updateProfileMutation.mutate({
-          fullName: formData.fullName || undefined,
-          phoneNumber: formData.phoneNumber || undefined,
-          nationalCode: formData.nationalCode || undefined,
+  useEffect(() => {
+    if (profileQuery.data) {
+      setProfile(profileQuery.data);
+      setFormData({
+        fullName: profileQuery.data.fullName || "",
+        nationalCode: profileQuery.data.nationalCode || "",
+        phoneNumber: profileQuery.data.phoneNumber || "",
       });
-  };
+    }
+  }, [profileQuery.data]);
 
-  const handlePasswordChange = (e: React.FormEvent) => {
-      e.preventDefault();
-      if (passwordData.newPassword.length < 8) {
-          setError("کلمه عبور جدید باید حداقل ۸ کاراکتر باشد");
-          return;
-      }
-      changePasswordMutation.mutate({
-          currentPassword: passwordData.currentPassword,
-          newPassword: passwordData.newPassword,
-      });
-  };
-
-  if (loading) return <div className="p-8 text-center">در حال بارگذاری...</div>;
+  // Use profileQuery.isLoading directly
+  if (profileQuery.isLoading) return <div className="p-8 text-center text-slate-500">در حال بارگذاری...</div>;
+  if (profileQuery.isError) return <div className="p-8 text-center text-red-500">خطا در دریافت اطلاعات: {profileQuery.error.message}</div>;
 
   return (
     <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 bg-gray-50 dark:bg-slate-900/50 min-h-screen">
@@ -131,7 +102,14 @@ export default function ProfileView() {
                 </div>
               </div>
             </div>
-            <form onSubmit={handleProfileUpdate} className="p-6 space-y-5">
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                updateProfileMutation.mutate({
+                    fullName: formData.fullName || undefined,
+                    nationalCode: formData.nationalCode || undefined,
+                    phoneNumber: formData.phoneNumber || undefined,
+                });
+            }} className="p-6 space-y-5">
               <div>
                 <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">نام و نام خانوادگی</label>
                 <input
@@ -186,7 +164,17 @@ export default function ProfileView() {
               </div>
             </div>
             <div className="p-6 space-y-6">
-              <form onSubmit={handlePasswordChange} className="space-y-4">
+              <form onSubmit={(e) => {
+                  e.preventDefault();
+                  if (passwordData.newPassword.length < 8) {
+                      setError("کلمه عبور جدید باید حداقل ۸ کاراکتر باشد");
+                      return;
+                  }
+                  changePasswordMutation.mutate({
+                      currentPassword: passwordData.currentPassword,
+                      newPassword: passwordData.newPassword,
+                  });
+              }} className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">تغییر گذرواژه</h4>
                 </div>

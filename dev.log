@@ -433,3 +433,59 @@ Import trace:
 ⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
 ✓ Ready in 6.6s
 ✓ Compiled in 55ms
+○ Compiling /login ...
+ GET /login 200 in 8.9s (compile: 6.8s, proxy.ts: 631ms, render: 1433ms)
+ GET /api/auth/providers 200 in 3.1s (compile: 3.0s, render: 71ms)
+ GET /api/auth/session 200 in 3.4s (compile: 3.4s, render: 77ms)
+ GET /api/auth/csrf 200 in 51ms (compile: 38ms, render: 13ms)
+ GET /api/auth/session 200 in 66ms (compile: 53ms, render: 13ms)
+Authorize error: Error: Failed query: select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3
+params: 0000000000,0000000000,1
+    at async Object.authorize (src/lib/auth.ts:57:24)
+  55 |
+  56 |         try {
+> 57 |           const user = await db.query.users.findFirst({
+     |                        ^
+  58 |             where: or(
+  59 |               eq(users.phoneNumber, identifier),
+  60 |               eq(users.nationalCode, identifier) {
+  query: 'select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3',
+  params: [Array],
+  [cause]: AggregateError:
+      at async Object.authorize (src/lib/auth.ts:57:24)
+    55 |
+    56 |         try {
+  > 57 |           const user = await db.query.users.findFirst({
+       |                        ^
+    58 |             where: or(
+    59 |               eq(users.phoneNumber, identifier),
+    60 |               eq(users.nationalCode, identifier) {
+    code: 'ECONNREFUSED'
+  }
+}
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:4314:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async AuthInternal (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5148:24)
+    at async Auth (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5370:34)
+    at async AppRouteRouteModule.do (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17154:38)
+    at async AppRouteRouteModule.handleResponse (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:1:191938)
+    at async handleResponse (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17217:32)
+    at async Module.handler (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17270:13)
+    at async DevServer.renderToResponseWithComponentsImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1442:9)
+    at async DevServer.renderPageComponent (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1494:24)
+    at async DevServer.renderToResponseImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1544:32)
+    at async DevServer.pipeImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1038:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/next-server.js:395:17)
+    at async DevServer.handleRequestImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:929:17)
+    at async /app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:387:20
+    at async Span.traceAsyncFn (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:383:24)
+    at async invokeRender (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:248:21)
+    at async handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:447:24)
+    at async requestHandlerImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:496:13)
+    at async Server.requestListener (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /api/auth/callback/credentials? 200 in 688ms (compile: 4ms, render: 684ms)
+ GET /api/auth/session 200 in 14ms (compile: 5ms, render: 9ms)
