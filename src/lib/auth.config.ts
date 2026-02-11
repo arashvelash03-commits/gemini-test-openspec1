@@ -11,8 +11,6 @@ export const authConfig = {
       const isOnSetup2FA = nextUrl.pathname.startsWith('/setup-2fa');
       const isPublic = isOnLogin;
 
-      // console.log(`[Middleware] Path: ${nextUrl.pathname}, LoggedIn: ${isLoggedIn}, Public: ${isPublic}`);
-
       if (isLoggedIn) {
         const user = auth.user;
         const isStaff = user.role === 'doctor' || user.role === 'clerk';

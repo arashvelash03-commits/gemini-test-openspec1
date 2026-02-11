@@ -18,9 +18,13 @@ export default function Setup2FAForm() {
 
   const generateMutation = trpc.totp.generateTotpSecret.useMutation({
     onSuccess: async (data) => {
-      // If backend says already enabled, force redirect immediately
+      // If backend says already enabled, update session and force redirect immediately
       if (data.alreadyEnabled) {
+          // Standard: Update session then navigate.
+          // Note: update() returns a promise that resolves when the session is updated on the client.
           await update({ totpEnabled: true });
+
+          // Force hard navigation to ensure fresh cookies/server state if middleware is caching
           window.location.href = "/dashboard";
           return;
       }
@@ -35,7 +39,10 @@ export default function Setup2FAForm() {
 
   const verifyMutation = trpc.totp.verifyAndEnableTotp.useMutation({
     onSuccess: async () => {
+      // Standard: Update session to reflect new 'totpEnabled: true' in JWT
       await update({ totpEnabled: true });
+
+      // Force hard navigation to ensure middleware sees the updated token (via fresh request)
       window.location.href = "/dashboard";
     },
     onError: (err) => {
@@ -50,7 +57,10 @@ export default function Setup2FAForm() {
   });
 
   useEffect(() => {
-    generateMutation.mutate();
+    // Only call mutate if we don't have a QR code yet to avoid double calls
+    if (!qrCodeUrl && !generateMutation.isPending && !generateMutation.data) {
+        generateMutation.mutate();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

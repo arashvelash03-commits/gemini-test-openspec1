@@ -16,7 +16,7 @@ const signInSchema = z.object({
 
 class TotpRequiredError extends CredentialsSignin {
   constructor() {
-    super("TOTP_REQUIRED"); // Message
+    super("TOTP_REQUIRED");
     this.code = "TOTP_REQUIRED";
   }
 }
@@ -45,11 +45,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         totpCode: { label: "TOTP Code", type: "text" },
       },
       authorize: async (credentials) => {
+        const parsedCredentials = await signInSchema.safeParseAsync(credentials);
+
+        if (!parsedCredentials.success) {
+            return null;
+        }
+
+        const { identifier, password, totpCode } = parsedCredentials.data;
+
         try {
-          const { identifier, password, totpCode } = await signInSchema.parseAsync(credentials);
-
-          console.log(`Authorize called for ${identifier}.`);
-
           const user = await db.query.users.findFirst({
             where: or(
               eq(users.phoneNumber, identifier),
@@ -57,23 +61,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ),
           });
 
-          if (!user) return null;
-          if (!user.passwordHash) return null;
+          if (!user || !user.passwordHash) return null;
 
           const passwordMatch = await bcrypt.compare(password, user.passwordHash);
           if (!passwordMatch) return null;
 
           if (user.totpEnabled) {
-            // Check for undefined, null, empty string, or "undefined" string explicitly
-            if (!totpCode || totpCode === "undefined" || totpCode === "null" || totpCode.trim() === "") {
-              console.log("Throwing TOTP_REQUIRED");
+            if (!totpCode || totpCode.trim() === "" || totpCode === "undefined" || totpCode === "null") {
               throw new TotpRequiredError();
             }
             if (!user.totpSecret) throw new TotpSetupError();
 
             const isValidTotp = authenticator.check(totpCode, user.totpSecret);
             if (!isValidTotp) {
-                console.log("Throwing INVALID_TOTP");
                 throw new InvalidTotpError();
             }
           }
@@ -88,18 +88,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
            if (error instanceof CredentialsSignin) {
                throw error;
            }
+           // Fallback to null for unknown errors to prevent crashing
            console.error("Authorize error:", error);
            return null;
         }
       },
     }),
   ],
-  logger: {
-    error(code, ...message) {
-      if (code.name === 'CredentialsSignin') {
-        return;
-      }
-      console.error(code, ...message);
-    },
-  },
+  // Standard logging configuration if needed, generally default is fine for dev
 });
