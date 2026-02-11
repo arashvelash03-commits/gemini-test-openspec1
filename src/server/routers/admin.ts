@@ -100,6 +100,7 @@ export const adminRouter = router({
 
       if (!user) throw new Error("User not found");
 
+      // Logic looks correct: if active -> inactive, else -> active
       const newStatus = user.status === "active" ? "inactive" : "active";
 
       await db.update(users)

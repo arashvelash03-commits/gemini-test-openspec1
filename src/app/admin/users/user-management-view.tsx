@@ -172,7 +172,14 @@ export default function UserManagementView() {
                                     غیرفعال‌سازی
                                 </button>
                             ) : (
-                                <button className="flex items-center gap-1 px-3 py-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors text-xs font-medium border border-emerald-100">
+                                <button
+                                    onClick={() => {
+                                        if(confirm(`آیا از فعال‌سازی مجدد کاربر ${user.fullName} اطمینان دارید؟`)) {
+                                            deactivateUserMutation.mutate({ id: user.id });
+                                        }
+                                    }}
+                                    className="flex items-center gap-1 px-3 py-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors text-xs font-medium border border-emerald-100"
+                                >
                                     <span className="material-symbols-outlined text-sm">person_check</span>
                                     فعال‌سازی مجدد
                                 </button>

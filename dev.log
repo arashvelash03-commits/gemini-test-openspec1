@@ -404,3 +404,13 @@ Import trace:
  GET /login 200 in 993ms (compile: 95ms, proxy.ts: 298ms, render: 600ms)
 [Middleware] Path: /login, LoggedIn: false, Public: true
  GET /login 200 in 860ms (compile: 73ms, proxy.ts: 214ms, render: 573ms)
+✓ Compiled in 3.3s
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 7.7s (compile: 2.2s, proxy.ts: 198ms, render: 5.3s)
+ GET /api/auth/session 200 in 624ms (compile: 579ms, render: 45ms)
+ GET /api/auth/session 200 in 22ms (compile: 9ms, render: 13ms)
+✓ Compiled in 550ms
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 2.7s (compile: 758ms, proxy.ts: 53ms, render: 1906ms)
+ GET /api/auth/session 200 in 915ms (compile: 861ms, render: 54ms)
+ GET /api/auth/session 200 in 12ms (compile: 5ms, render: 8ms)

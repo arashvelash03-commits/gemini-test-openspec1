@@ -35,39 +35,6 @@ class TotpSetupError extends CredentialsSignin {
   }
 }
 
-// Mock users for testing when DB is unavailable
-const MOCK_USERS = {
-  "0000000000": {
-    id: "mock-admin-id",
-    name: "Mock Admin",
-    role: "admin",
-    totpEnabled: false,
-    passwordHash: "$2a$10$abcdefg...",
-  },
-  "1111111111": {
-    id: "mock-doctor-no2fa-id",
-    name: "Mock Doctor No 2FA",
-    role: "doctor",
-    totpEnabled: false,
-    passwordHash: "$2a$10$abcdefg...",
-  },
-  "2222222222": {
-    id: "mock-doctor-2fa-id",
-    name: "Mock Doctor With 2FA",
-    role: "doctor",
-    totpEnabled: true,
-    totpSecret: "KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD", // Known secret
-    passwordHash: "$2a$10$abcdefg...",
-  },
-  "3333333333": {
-    id: "mock-clerk-id",
-    name: "Mock Clerk",
-    role: "clerk",
-    totpEnabled: false,
-    passwordHash: "$2a$10$abcdefg...",
-  },
-};
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   providers: [
@@ -81,31 +48,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           const { identifier, password, totpCode } = await signInSchema.parseAsync(credentials);
 
-          // Mock user logic (Keep until DB is stable)
-          if (MOCK_USERS[identifier as keyof typeof MOCK_USERS]) {
-             const mockUser = MOCK_USERS[identifier as keyof typeof MOCK_USERS];
-             if (password === "password123") {
-                if (mockUser.totpEnabled) {
-                   // Check for undefined, null, empty string, or "undefined" string explicitly
-                   if (!totpCode || totpCode === "undefined" || totpCode === "null" || totpCode.trim() === "") {
-                       throw new TotpRequiredError();
-                   }
-                   const isValid = authenticator.check(totpCode, mockUser.totpSecret!);
-                   if (!isValid) {
-                       throw new InvalidTotpError();
-                   }
-                }
-                return {
-                   id: mockUser.id,
-                   name: mockUser.name,
-                   role: mockUser.role,
-                   totpEnabled: mockUser.totpEnabled,
-                };
-             }
-             return null;
-          }
+          console.log(`Authorize called for ${identifier}.`);
 
-          // ... (DB logic similar update) ...
           const user = await db.query.users.findFirst({
             where: or(
               eq(users.phoneNumber, identifier),
@@ -120,13 +64,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!passwordMatch) return null;
 
           if (user.totpEnabled) {
+            // Check for undefined, null, empty string, or "undefined" string explicitly
             if (!totpCode || totpCode === "undefined" || totpCode === "null" || totpCode.trim() === "") {
+              console.log("Throwing TOTP_REQUIRED");
               throw new TotpRequiredError();
             }
             if (!user.totpSecret) throw new TotpSetupError();
 
             const isValidTotp = authenticator.check(totpCode, user.totpSecret);
-            if (!isValidTotp) throw new InvalidTotpError();
+            if (!isValidTotp) {
+                console.log("Throwing INVALID_TOTP");
+                throw new InvalidTotpError();
+            }
           }
 
           return {
