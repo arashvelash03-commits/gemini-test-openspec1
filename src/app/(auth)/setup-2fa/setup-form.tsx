@@ -5,9 +5,11 @@ import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LogoutButton } from "@/components/auth/logout-button";
+import { useSession } from "next-auth/react";
 
 export default function Setup2FAForm() {
   const router = useRouter();
+  const { update } = useSession(); // Hook to update session
   const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
   const [secret, setSecret] = useState<string | null>(null);
   const [code, setCode] = useState("");
@@ -26,9 +28,12 @@ export default function Setup2FAForm() {
   });
 
   const verifyMutation = trpc.totp.verifyAndEnableTotp.useMutation({
-    onSuccess: () => {
-      router.push("/dashboard");
-      router.refresh();
+    onSuccess: async () => {
+      // Force session update to reflect new TOTP status
+      await update({ totpEnabled: true });
+
+      // Force hard refresh to ensure middleware catches new session state
+      window.location.href = "/dashboard";
     },
     onError: (err) => {
         if(err.message === "Invalid token") {
