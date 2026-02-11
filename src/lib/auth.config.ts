@@ -11,7 +11,7 @@ export const authConfig = {
       const isOnSetup2FA = nextUrl.pathname.startsWith('/setup-2fa');
       const isPublic = isOnLogin;
 
-      console.log(`[Middleware] Path: ${nextUrl.pathname}, LoggedIn: ${isLoggedIn}, Public: ${isPublic}`);
+      // console.log(`[Middleware] Path: ${nextUrl.pathname}, LoggedIn: ${isLoggedIn}, Public: ${isPublic}`);
 
       if (isLoggedIn) {
         const user = auth.user;
@@ -35,7 +35,6 @@ export const authConfig = {
         // Mandatory 2FA Check for Staff
         if (isStaff && !user.totpEnabled) {
              if (!isOnSetup2FA) {
-                // Prevent infinite redirect if we are already redirecting to setup-2fa
                 return Response.redirect(new URL('/setup-2fa', nextUrl));
              }
              // Allow access to setup-2fa
@@ -63,12 +62,20 @@ export const authConfig = {
 
       return false;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.role = user.role;
         token.id = user.id;
         token.totpEnabled = user.totpEnabled;
       }
+
+      // Handle session update (e.g. after enabling 2FA)
+      if (trigger === "update" && session) {
+          if (session.totpEnabled !== undefined) {
+              token.totpEnabled = session.totpEnabled;
+          }
+      }
+
       return token;
     },
     async session({ session, token }) {

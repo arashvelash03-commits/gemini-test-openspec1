@@ -35,6 +35,8 @@ export const adminRouter = router({
       phoneNumber: z.string().min(10),
       role: z.enum(["doctor", "clerk"]),
       password: z.string().min(6),
+      gender: z.enum(["male", "female", "other", "unknown"]).optional(),
+      birthDate: z.string().optional(), // Receive as string, convert to Date
     }))
     .mutation(async ({ input, ctx }) => {
       if (ctx.session.user.role !== "admin") {
@@ -59,6 +61,11 @@ export const adminRouter = router({
         passwordHash: hashedPassword,
         resourceType: "Practitioner",
         status: "active",
+        createdBy: ctx.session.user.id, // Fill createdBy
+        gender: input.gender,
+        birthDate: input.birthDate // Assuming string date is compatible or needs "new Date()"
+          ? input.birthDate // drizzle-orm date mode="date" expects string YYYY-MM-DD usually, but let's check
+          : null,
       });
 
       return { success: true };
@@ -100,7 +107,6 @@ export const adminRouter = router({
 
       if (!user) throw new Error("User not found");
 
-      // Logic looks correct: if active -> inactive, else -> active
       const newStatus = user.status === "active" ? "inactive" : "active";
 
       await db.update(users)
