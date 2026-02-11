@@ -21,6 +21,7 @@ export const profileRouter = router({
         nationalCode: user.nationalCode,
         phoneNumber: user.phoneNumber,
         totpEnabled: user.totpEnabled,
+        birthDate: user.birthDate,
       };
     }),
 
@@ -29,6 +30,7 @@ export const profileRouter = router({
       fullName: z.string().optional(),
       nationalCode: z.string().optional(),
       phoneNumber: z.string().optional(),
+      birthDate: z.string().optional(), // Receive as string YYYY-MM-DD
     }))
     .mutation(async ({ input, ctx }) => {
       await db.update(users)
@@ -36,6 +38,7 @@ export const profileRouter = router({
           fullName: input.fullName,
           nationalCode: input.nationalCode,
           phoneNumber: input.phoneNumber,
+          birthDate: input.birthDate,
         })
         .where(eq(users.id, ctx.session.user.id));
 
