@@ -599,3 +599,4 @@ params: 0000000000,0000000000,1
     at async Server.requestListener (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/start-server.js:226:13)
  POST /api/auth/callback/credentials? 200 in 3.0s (compile: 12ms, render: 3.0s)
  GET /api/auth/session 200 in 267ms (compile: 160ms, render: 107ms)
+✓ Compiled in 58ms
