@@ -358,3 +358,244 @@ Authorize called for 2222222222. TOTP Code: '959126' (type: string)
  GET /api/trpc/profile.getProfile?batch=1&input=%7B%7D 404 in 61ms (compile: 39ms, render: 22ms)
 ✓ Compiled in 51ms
 ✓ Compiled in 48ms
+  Reload env: .env
+  Reload env: .env.local
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 4.7s (compile: 915ms, proxy.ts: 1007ms, render: 2.8s)
+ GET /api/auth/providers 200 in 2.7s (compile: 2.6s, render: 38ms)
+ GET /api/auth/csrf 200 in 18ms (compile: 6ms, render: 12ms)
+ POST /api/auth/callback/credentials? 200 in 79ms (compile: 6ms, render: 72ms)
+[Middleware] Path: /, LoggedIn: true, Public: false
+[Middleware] Path: /admin/users, LoggedIn: true, Public: false
+ GET /admin/users 200 in 1067ms (compile: 782ms, proxy.ts: 19ms, render: 266ms)
+[Middleware] Path: /admin/users, LoggedIn: true, Public: false
+ GET /admin/users 200 in 81ms (compile: 6ms, proxy.ts: 30ms, render: 45ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 360ms (compile: 11ms, proxy.ts: 23ms, render: 326ms)
+⨯ ./src/server/routers/admin.ts:1:1
+Export protectedProcedure doesn't exist in target module
+[0m[31m[1m>[22m[39m[90m 1 |[39m [36mimport[39m { router[33m,[39m protectedProcedure } [36mfrom[39m [32m"../trpc"[39m[33m;[39m
+ [90m   |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m
+ [90m 2 |[39m [36mimport[39m { z } [36mfrom[39m [32m"zod"[39m[33m;[39m
+ [90m 3 |[39m [36mimport[39m { db } [36mfrom[39m [32m"@/lib/db"[39m[33m;[39m
+ [90m 4 |[39m [36mimport[39m { users } [36mfrom[39m [32m"@/lib/db/schema"[39m[33m;[39m[0m
+
+The export protectedProcedure was not found in module [project]/src/server/trpc.ts [app-route] (ecmascript).
+Did you mean to import router?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import trace:
+  App Route:
+    ./src/server/routers/admin.ts
+    ./src/server/index.ts
+    ./src/app/api/trpc/[trpc]/route.ts
+
+
+○ Compiling /_error ...
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 149ms (compile: 8ms, proxy.ts: 14ms, render: 126ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 95ms (compile: 8ms, proxy.ts: 7ms, render: 80ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 142ms (compile: 5ms, proxy.ts: 7ms, render: 130ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 95ms (compile: 4ms, proxy.ts: 7ms, render: 84ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 993ms (compile: 95ms, proxy.ts: 298ms, render: 600ms)
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 860ms (compile: 73ms, proxy.ts: 214ms, render: 573ms)
+✓ Compiled in 3.3s
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 7.7s (compile: 2.2s, proxy.ts: 198ms, render: 5.3s)
+ GET /api/auth/session 200 in 624ms (compile: 579ms, render: 45ms)
+ GET /api/auth/session 200 in 22ms (compile: 9ms, render: 13ms)
+✓ Compiled in 550ms
+[Middleware] Path: /login, LoggedIn: false, Public: true
+ GET /login 200 in 2.7s (compile: 758ms, proxy.ts: 53ms, render: 1906ms)
+ GET /api/auth/session 200 in 915ms (compile: 861ms, render: 54ms)
+ GET /api/auth/session 200 in 12ms (compile: 5ms, render: 8ms)
+✓ Compiled in 1664ms
+ GET /login 200 in 4.4s (compile: 2.4s, proxy.ts: 732ms, render: 1283ms)
+ GET /api/auth/session 200 in 4.0s (compile: 3.9s, render: 84ms)
+ GET /api/auth/session 200 in 28ms (compile: 14ms, render: 14ms)
+ GET /login 200 in 606ms (compile: 67ms, proxy.ts: 104ms, render: 435ms)
+ GET /api/auth/session 200 in 278ms (compile: 244ms, render: 34ms)
+ GET /api/auth/session 200 in 42ms (compile: 10ms, render: 32ms)
+✓ Compiled in 1204ms
+✓ Compiled in 176ms
+⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+▲ Next.js 16.1.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.0.2:3000
+- Environments: .env.local, .env
+
+✓ Starting...
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+✓ Ready in 6.6s
+✓ Compiled in 55ms
+○ Compiling /login ...
+ GET /login 200 in 8.9s (compile: 6.8s, proxy.ts: 631ms, render: 1433ms)
+ GET /api/auth/providers 200 in 3.1s (compile: 3.0s, render: 71ms)
+ GET /api/auth/session 200 in 3.4s (compile: 3.4s, render: 77ms)
+ GET /api/auth/csrf 200 in 51ms (compile: 38ms, render: 13ms)
+ GET /api/auth/session 200 in 66ms (compile: 53ms, render: 13ms)
+Authorize error: Error: Failed query: select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3
+params: 0000000000,0000000000,1
+    at async Object.authorize (src/lib/auth.ts:57:24)
+  55 |
+  56 |         try {
+> 57 |           const user = await db.query.users.findFirst({
+     |                        ^
+  58 |             where: or(
+  59 |               eq(users.phoneNumber, identifier),
+  60 |               eq(users.nationalCode, identifier) {
+  query: 'select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3',
+  params: [Array],
+  [cause]: AggregateError:
+      at async Object.authorize (src/lib/auth.ts:57:24)
+    55 |
+    56 |         try {
+  > 57 |           const user = await db.query.users.findFirst({
+       |                        ^
+    58 |             where: or(
+    59 |               eq(users.phoneNumber, identifier),
+    60 |               eq(users.nationalCode, identifier) {
+    code: 'ECONNREFUSED'
+  }
+}
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:4314:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async AuthInternal (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5148:24)
+    at async Auth (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5370:34)
+    at async AppRouteRouteModule.do (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17154:38)
+    at async AppRouteRouteModule.handleResponse (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:1:191938)
+    at async handleResponse (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17217:32)
+    at async Module.handler (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17270:13)
+    at async DevServer.renderToResponseWithComponentsImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1442:9)
+    at async DevServer.renderPageComponent (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1494:24)
+    at async DevServer.renderToResponseImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1544:32)
+    at async DevServer.pipeImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1038:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/next-server.js:395:17)
+    at async DevServer.handleRequestImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:929:17)
+    at async /app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:387:20
+    at async Span.traceAsyncFn (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:383:24)
+    at async invokeRender (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:248:21)
+    at async handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:447:24)
+    at async requestHandlerImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:496:13)
+    at async Server.requestListener (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /api/auth/callback/credentials? 200 in 688ms (compile: 4ms, render: 684ms)
+ GET /api/auth/session 200 in 14ms (compile: 5ms, render: 9ms)
+ GET /login 200 in 2.3s (compile: 337ms, proxy.ts: 318ms, render: 1663ms)
+ GET /api/auth/session 200 in 691ms (compile: 672ms, render: 18ms)
+ GET /api/auth/providers 200 in 25ms (compile: 10ms, render: 15ms)
+ GET /api/auth/session 200 in 30ms (compile: 11ms, render: 19ms)
+ GET /api/auth/csrf 200 in 23ms (compile: 6ms, render: 17ms)
+Authorize error: Error: Failed query: select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3
+params: 0000000000,0000000000,1
+    at async Object.authorize (src/lib/auth.ts:57:24)
+  55 |
+  56 |         try {
+> 57 |           const user = await db.query.users.findFirst({
+     |                        ^
+  58 |             where: or(
+  59 |               eq(users.phoneNumber, identifier),
+  60 |               eq(users.nationalCode, identifier) {
+  query: 'select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3',
+  params: [Array],
+  [cause]: AggregateError:
+      at async Object.authorize (src/lib/auth.ts:57:24)
+    55 |
+    56 |         try {
+  > 57 |           const user = await db.query.users.findFirst({
+       |                        ^
+    58 |             where: or(
+    59 |               eq(users.phoneNumber, identifier),
+    60 |               eq(users.nationalCode, identifier) {
+    code: 'ECONNREFUSED'
+  }
+}
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:4314:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async AuthInternal (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5148:24)
+    at async Auth (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5370:34)
+    at async AppRouteRouteModule.do (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17154:38)
+    at async AppRouteRouteModule.handleResponse (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:1:191938)
+    at async handleResponse (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17217:32)
+    at async Module.handler (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17270:13)
+    at async DevServer.renderToResponseWithComponentsImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1442:9)
+    at async DevServer.renderPageComponent (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1494:24)
+    at async DevServer.renderToResponseImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1544:32)
+    at async DevServer.pipeImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1038:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/next-server.js:395:17)
+    at async DevServer.handleRequestImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:929:17)
+    at async /app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:387:20
+    at async Span.traceAsyncFn (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:383:24)
+    at async invokeRender (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:248:21)
+    at async handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:447:24)
+    at async requestHandlerImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:496:13)
+    at async Server.requestListener (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /api/auth/callback/credentials? 200 in 894ms (compile: 5ms, render: 889ms)
+ GET /api/auth/session 200 in 30ms (compile: 6ms, render: 23ms)
+ GET /login 200 in 4.4s (compile: 323ms, proxy.ts: 934ms, render: 3.1s)
+ GET /api/auth/session 200 in 1459ms (compile: 1222ms, render: 237ms)
+ GET /api/auth/providers 200 in 44ms (compile: 21ms, render: 23ms)
+ GET /api/auth/session 200 in 78ms (compile: 15ms, render: 62ms)
+ GET /api/auth/csrf 200 in 48ms (compile: 12ms, render: 36ms)
+Authorize error: Error: Failed query: select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3
+params: 0000000000,0000000000,1
+    at async Object.authorize (src/lib/auth.ts:57:24)
+  55 |
+  56 |         try {
+> 57 |           const user = await db.query.users.findFirst({
+     |                        ^
+  58 |             where: or(
+  59 |               eq(users.phoneNumber, identifier),
+  60 |               eq(users.nationalCode, identifier) {
+  query: 'select "id", "national_code", "phone_number", "password_hash", "created_by", "role", "full_name", "gender", "birth_date", "status", "resource_type", "fhir_data", "totp_secret", "totp_enabled", "created_at", "updated_at", "deleted_at" from "users" "users" where ("users"."phone_number" = $1 or "users"."national_code" = $2) limit $3',
+  params: [Array],
+  [cause]: AggregateError:
+      at async Object.authorize (src/lib/auth.ts:57:24)
+    55 |
+    56 |         try {
+  > 57 |           const user = await db.query.users.findFirst({
+       |                        ^
+    58 |             where: or(
+    59 |               eq(users.phoneNumber, identifier),
+    60 |               eq(users.nationalCode, identifier) {
+    code: 'ECONNREFUSED'
+  }
+}
+[31m[auth][error][0m CredentialsSignin: Read more at https://errors.authjs.dev#credentialssignin
+    at Module.callback (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:4314:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async AuthInternal (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5148:24)
+    at async Auth (/app/.next/dev/server/chunks/691c0_@auth_core_843d8dff._.js:5370:34)
+    at async AppRouteRouteModule.do (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:37866)
+    at async AppRouteRouteModule.handle (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:5:45156)
+    at async responseGenerator (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17154:38)
+    at async AppRouteRouteModule.handleResponse (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/compiled/next-server/app-route-turbo.runtime.dev.js:1:191938)
+    at async handleResponse (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17217:32)
+    at async Module.handler (/app/.next/dev/server/chunks/b2b3e_next_ff3b9243._.js:17270:13)
+    at async DevServer.renderToResponseWithComponentsImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1442:9)
+    at async DevServer.renderPageComponent (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1494:24)
+    at async DevServer.renderToResponseImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1544:32)
+    at async DevServer.pipeImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:1038:25)
+    at async NextNodeServer.handleCatchallRenderRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/next-server.js:395:17)
+    at async DevServer.handleRequestImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/base-server.js:929:17)
+    at async /app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:387:20
+    at async Span.traceAsyncFn (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/trace/trace.js:157:20)
+    at async DevServer.handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/dev/next-dev-server.js:383:24)
+    at async invokeRender (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:248:21)
+    at async handleRequest (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:447:24)
+    at async requestHandlerImpl (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/router-server.js:496:13)
+    at async Server.requestListener (/app/node_modules/.pnpm/next@16.1.6_@babel+core@7.29.0_react-dom@19.2.3_react@19.2.3__react@19.2.3/node_modules/next/dist/server/lib/start-server.js:226:13)
+ POST /api/auth/callback/credentials? 200 in 3.0s (compile: 12ms, render: 3.0s)
+ GET /api/auth/session 200 in 267ms (compile: 160ms, render: 107ms)

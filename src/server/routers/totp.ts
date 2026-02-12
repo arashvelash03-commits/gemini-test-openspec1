@@ -1,55 +1,60 @@
-import { publicProcedure, router } from "../trpc";
+import { protectedProcedure, router } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import { eq, or } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { authenticator } from "otplib";
 import QRCode from "qrcode";
 import { TRPCError } from "@trpc/server";
 
 export const totpRouter = router({
-  generateTotpSecret: publicProcedure
-    .input(z.object({ identifier: z.string() }))
-    .mutation(async ({ input }) => {
-      const { identifier } = input;
+  generateTotpSecret: protectedProcedure
+    .mutation(async ({ ctx }) => {
       const user = await db.query.users.findFirst({
-        where: or(
-          eq(users.phoneNumber, identifier),
-          eq(users.nationalCode, identifier)
-        ),
+        where: eq(users.id, ctx.session.user.id),
       });
 
       if (!user) {
         throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
       }
 
-      const secret = authenticator.generateSecret();
+      if (user.totpEnabled) {
+          // If already enabled, returning null or special status might be better,
+          // but strictly speaking we shouldn't be generating a secret.
+          // For the frontend to handle this gracefully:
+          return { secret: null, qrCodeUrl: null, alreadyEnabled: true };
+      }
+
+      let secret = user.totpSecret;
+
+      // If no secret exists, or if we want to ensure a secret exists for setup
+      if (!secret) {
+          secret = authenticator.generateSecret();
+          // Save secret to DB (enabled=false until verified)
+          await db
+            .update(users)
+            .set({ totpSecret: secret, totpEnabled: false })
+            .where(eq(users.id, user.id));
+      }
+
+      // Re-generate QR code for the (existing or new) secret
       const otpauth = authenticator.keyuri(
-        user.nationalCode, // Use national code as username in Authenticator
+        user.nationalCode,
         "GeminiTest",
         secret
       );
 
-      // Save secret to DB (enabled=false until verified)
-      await db
-        .update(users)
-        .set({ totpSecret: secret, totpEnabled: false })
-        .where(eq(users.id, user.id));
-
       const qrCodeUrl = await QRCode.toDataURL(otpauth);
 
-      return { secret, qrCodeUrl };
+      return { secret, qrCodeUrl, alreadyEnabled: false };
     }),
 
-  verifyAndEnableTotp: publicProcedure
-    .input(z.object({ identifier: z.string(), token: z.string() }))
-    .mutation(async ({ input }) => {
-      const { identifier, token } = input;
+  verifyAndEnableTotp: protectedProcedure
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      const { token } = input;
       const user = await db.query.users.findFirst({
-        where: or(
-          eq(users.phoneNumber, identifier),
-          eq(users.nationalCode, identifier)
-        ),
+        where: eq(users.id, ctx.session.user.id),
       });
 
       if (!user || !user.totpSecret) {

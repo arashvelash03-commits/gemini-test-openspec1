@@ -10,7 +10,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:seed": "node scripts/seed.js",
+    "db:seed": "tsx scripts/seed.ts",
     "db:debug": "node scripts/debug-db.js",
     "test:login": "node scripts/test-login.js"
   },

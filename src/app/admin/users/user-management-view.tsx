@@ -19,6 +19,8 @@ export default function UserManagementView() {
     phoneNumber: "",
     role: "doctor" as "doctor" | "clerk",
     password: "",
+    gender: "male" as "male" | "female" | "other" | "unknown",
+    birthDate: "",
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -88,6 +90,8 @@ export default function UserManagementView() {
             phoneNumber: formData.phoneNumber,
             role: formData.role,
             password: formData.password,
+            gender: formData.gender,
+            birthDate: formData.birthDate || undefined,
         });
     }
   };
@@ -98,8 +102,10 @@ export default function UserManagementView() {
           fullName: user.fullName || "",
           nationalCode: user.nationalCode,
           phoneNumber: user.phoneNumber || "",
-          role: user.role === "doctor" || user.role === "clerk" ? user.role : "doctor", // Default to doctor if role is not editable/supported in form
-          password: "", // Password not filled
+          role: user.role === "doctor" || user.role === "clerk" ? user.role : "doctor",
+          password: "",
+          gender: "male", // Default or fetch if available (currently list doesn't return gender)
+          birthDate: "", // Default or fetch
       });
       setError("");
       setSuccess("");
@@ -113,6 +119,8 @@ export default function UserManagementView() {
         phoneNumber: "",
         role: "doctor",
         password: "",
+        gender: "male",
+        birthDate: "",
       });
   };
 
@@ -172,7 +180,14 @@ export default function UserManagementView() {
                                     غیرفعال‌سازی
                                 </button>
                             ) : (
-                                <button className="flex items-center gap-1 px-3 py-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors text-xs font-medium border border-emerald-100">
+                                <button
+                                    onClick={() => {
+                                        if(confirm(`آیا از فعال‌سازی مجدد کاربر ${user.fullName} اطمینان دارید؟`)) {
+                                            deactivateUserMutation.mutate({ id: user.id });
+                                        }
+                                    }}
+                                    className="flex items-center gap-1 px-3 py-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors text-xs font-medium border border-emerald-100"
+                                >
                                     <span className="material-symbols-outlined text-sm">person_check</span>
                                     فعال‌سازی مجدد
                                 </button>
@@ -287,6 +302,31 @@ export default function UserManagementView() {
           </div>
 
           {!editingId && (
+            <>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 block mr-1">جنسیت</label>
+                    <select
+                        value={formData.gender}
+                        onChange={(e) => setFormData({...formData, gender: e.target.value as "male" | "female" | "other" | "unknown"})}
+                        className="w-full h-12 px-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none bg-white"
+                    >
+                        <option value="male">مرد</option>
+                        <option value="female">زن</option>
+                        <option value="other">سایر</option>
+                    </select>
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-700 block mr-1">تاریخ تولد</label>
+                    <input
+                        type="date"
+                        value={formData.birthDate}
+                        onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
+                        className="w-full h-12 px-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none font-numbers"
+                    />
+                </div>
+            </div>
+
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="password">کلمه عبور موقت</label>
                 <div className="relative">
@@ -301,6 +341,7 @@ export default function UserManagementView() {
                 />
                 </div>
             </div>
+            </>
           )}
 
           <div className="pt-4">
