@@ -68,8 +68,7 @@ export function ClerkSidebar() {
           <div className="px-2 py-2 flex items-center gap-1.5 border-t border-dashed border-border-light dark:border-border-dark bg-primary-light/30 dark:bg-primary-dark/10 hover:bg-primary-light/50 dark:hover:bg-primary-dark/20 cursor-pointer transition-colors">
             <div className="relative flex-none">
               <div className="w-9 h-9 rounded-full bg-white dark:bg-gray-800 text-primary flex items-center justify-center font-bold text-xs shadow-sm overflow-hidden">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img alt="Patient" className="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXowbGJ2HFD-OuQS1Iz74X8tz8rEb8WBpPPLaTbJQzQrFxsHKeA8umd2B5jvM2hqqj2dYMofQZit-WcOQXkmR17aO-rhvdlP6jTM3FiRTNIb7AITUbObL7WTxks5uO760XPWK9YYBX-Tse5298ogL2KLnDLVsc7Uq7zw0CEOdHi5l3HDv8B053JY-BEwWOuFf8mAbLAWkqy9ecyl5t0WgHxezElpv-W8ZJ-wNnaRQGWDl_8M2_vs6DgIvZarB6vxvKoHntocSPDdeD"/>
+                <span className="material-symbols-outlined text-3xl">account_circle</span>
               </div>
               <span className="absolute -bottom-1 -right-1 flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -87,7 +86,7 @@ export function ClerkSidebar() {
               پایان ویزیت
             </button>
           </div>
-           {/* Add other mocked items similarly if needed, or stick to this one for demo */}
+
            <div className="px-2 py-2 flex items-center gap-1.5 border-t border-dashed border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors">
             <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 flex items-center justify-center font-bold text-xs flex-none">MS</div>
             <div className="flex-1">
@@ -95,6 +94,19 @@ export function ClerkSidebar() {
                 <p className="text-[9px] text-text-secondary-light font-medium flex items-center gap-0.5">
                     <span className="material-symbols-outlined text-[11px]">timer</span>
                     ۱۵:۰۳ در ویزیت
+                </p>
+            </div>
+            <button className="bg-[#94a3b8] hover:bg-slate-500 text-white text-[10px] px-2 py-1 rounded-md shadow-sm flex items-center gap-0.5 transition-all">
+                پایان ویزیت
+            </button>
+          </div>
+           <div className="px-2 py-2 flex items-center gap-1.5 border-t border-dashed border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800/50 cursor-pointer transition-colors">
+            <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 flex items-center justify-center font-bold text-xs flex-none">HR</div>
+            <div className="flex-1">
+                <p className="font-bold text-sm text-text-primary-light dark:text-text-primary-dark">حامد رسولی</p>
+                <p className="text-[9px] text-text-secondary-light font-medium flex items-center gap-0.5">
+                    <span className="material-symbols-outlined text-[11px]">timer</span>
+                    ۰۲:۱۰ در ویزیت
                 </p>
             </div>
             <button className="bg-[#94a3b8] hover:bg-slate-500 text-white text-[10px] px-2 py-1 rounded-md shadow-sm flex items-center gap-0.5 transition-all">
