@@ -1,6 +1,6 @@
 # Story 1.2: Enforce Mandatory 2FA for Staff
 
-Status: ready-for-dev
+Status: complete
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -56,10 +56,23 @@ so that sensitive patient data is protected with an additional layer of security
 
 ### Agent Model Used
 
-{{agent_model_name_version}}
+Gemini 2.0 Flash
 
 ### Debug Log References
 
 ### Completion Notes List
 
+- Implemented mandatory 2FA check in `auth.config.ts` middleware logic.
+- Created `setup-2fa` page for staff members who haven't enabled 2FA yet.
+- Integrated `qrcode` for QR code generation.
+- Added `totpRouter` for handling secret generation and verification.
+- **Refinement:**
+    - Addressed flakiness in login flow by increasing TOTP window to 1 (30s drift).
+    - Ensured `login-form.tsx` correctly handles the transition from password check to TOTP check without losing user state.
+
 ### File List
+
+- `src/app/(auth)/setup-2fa/page.tsx`
+- `src/server/routers/totp.ts`
+- `src/lib/auth.config.ts`
+- `package.json` (added `otplib`, `qrcode`)

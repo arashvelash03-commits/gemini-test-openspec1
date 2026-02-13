@@ -1,6 +1,6 @@
 # Story 1.4: Admin-Led User Provisioning
 
-Status: done
+Status: complete
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 

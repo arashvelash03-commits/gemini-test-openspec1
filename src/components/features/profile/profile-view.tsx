@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "@/app/_trpc/client";
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { profileSchema, passwordSchema, ProfileFormValues, PasswordFormValues } from "./profile-schema";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +14,7 @@ export function ProfileView() {
   const utils = trpc.useUtils();
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'profile' | 'password' | '2fa'>('profile');
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
 
   const { data: profileData, isLoading } = trpc.profile.getProfile.useQuery();
 
@@ -34,6 +34,7 @@ export function ProfileView() {
     onSuccess: () => {
       setSuccessMessage("کلمه عبور با موفقیت تغییر کرد");
       passwordForm.reset();
+      setShowPasswordChange(false);
       setTimeout(() => setSuccessMessage(null), 3000);
     },
     onError: (error) => {
@@ -44,10 +45,7 @@ export function ProfileView() {
 
   const reset2FAMutation = trpc.profile.reset2FA.useMutation({
       onSuccess: () => {
-          setSuccessMessage("تنظیمات دو مرحله‌ای بازنشانی شد. لطفا مجددا فعال‌سازی کنید.");
-          setTimeout(() => {
-              router.push("/setup-2fa");
-          }, 2000);
+          signOut({ callbackUrl: '/setup-2fa' });
       },
       onError: (error) => {
           setErrorMessage(error.message);
@@ -90,242 +88,271 @@ export function ProfileView() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-6">
-
-      {/* Header Section */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary-light to-primary/20 flex items-center justify-center text-primary text-2xl font-bold shadow-sm border border-primary/20">
-            {profileData?.fullName?.[0] || "U"}
-        </div>
-        <div>
-            <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-100">{profileData?.fullName}</h1>
-            <p className="text-slate-500 text-sm mt-1 flex items-center gap-2">
-                <span className="material-symbols-outlined text-base">badge</span>
-                {session?.user?.role === 'admin' ? 'مدیر سیستم' : session?.user?.role === 'doctor' ? 'پزشک متخصص' : 'کارشناس پذیرش'}
-            </p>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex border-b border-slate-200 dark:border-slate-700 mb-6 overflow-x-auto">
-        <button
-            onClick={() => setActiveTab('profile')}
-            className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'profile' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-        >
-            مشخصات فردی
-        </button>
-        <button
-            onClick={() => setActiveTab('password')}
-            className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === 'password' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-        >
-            تغییر رمز عبور
-        </button>
-        <button
-            onClick={() => setActiveTab('2fa')}
-            className={`px-6 py-3 text-sm font-medium transition-colors border-b-2 ${activeTab === '2fa' ? 'border-primary text-primary' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
-        >
-            امنیت دو مرحله‌ای
-        </button>
-      </div>
-
-      {/* Notifications */}
-      {successMessage && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg flex items-center gap-2 animate-fade-in">
-          <span className="material-symbols-outlined">check_circle</span>
-          {successMessage}
-        </div>
-      )}
-      {errorMessage && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-2 animate-fade-in">
-          <span className="material-symbols-outlined">error</span>
-          {errorMessage}
-        </div>
-      )}
-
-      {/* Profile Form */}
-      {activeTab === 'profile' && (
-      <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8 transition-all">
-        <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">نام و نام خانوادگی</label>
-              <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
-                  <input
-                    {...profileForm.register("fullName")}
-                    className="w-full h-11 pr-10 pl-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                    disabled={updateProfileMutation.isPending}
-                  />
-              </div>
-              {profileForm.formState.errors.fullName && <p className="text-xs text-red-500">{profileForm.formState.errors.fullName.message}</p>}
+    <div className="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-8 bg-gray-50 dark:bg-background-dark/50">
+        <div className="max-w-5xl mx-auto">
+            <div className="mb-8">
+                <h2 className="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">تنظیمات حساب کاربری</h2>
+                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mt-1">اطلاعات شخصی و امنیت حساب خود را مدیریت کنید.</p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">کد ملی</label>
-              <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">fingerprint</span>
-                  <input
-                    {...profileForm.register("nationalCode")}
-                    className="w-full h-11 pr-10 pl-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono tracking-wider"
-                    disabled={updateProfileMutation.isPending}
-                  />
-              </div>
-              {profileForm.formState.errors.nationalCode && <p className="text-xs text-red-500">{profileForm.formState.errors.nationalCode.message}</p>}
-            </div>
+             {/* Notifications */}
+            {successMessage && (
+                <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg flex items-center gap-2 animate-fade-in">
+                <span className="material-symbols-outlined">check_circle</span>
+                {successMessage}
+                </div>
+            )}
+            {errorMessage && (
+                <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-center gap-2 animate-fade-in">
+                <span className="material-symbols-outlined">error</span>
+                {errorMessage}
+                </div>
+            )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">شماره موبایل</label>
-              <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">smartphone</span>
-                  <input
-                    {...profileForm.register("phoneNumber")}
-                    className="w-full h-11 pr-10 pl-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none font-mono tracking-wider"
-                    disabled={updateProfileMutation.isPending}
-                  />
-              </div>
-              {profileForm.formState.errors.phoneNumber && <p className="text-xs text-red-500">{profileForm.formState.errors.phoneNumber.message}</p>}
-            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* User Information Card */}
+                <div className="bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark card-shadow flex flex-col">
+                    <div className="p-6 border-b border-border-light dark:border-border-dark flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 flex items-center justify-center">
+                                <span className="material-symbols-outlined">person</span>
+                            </div>
+                            <div>
+                                <h3 className="font-bold">اطلاعات کاربری</h3>
+                                <p className="text-[10px] text-text-secondary-light">مشخصات فردی و تماس</p>
+                            </div>
+                        </div>
+                         {/* Edit button could toggle read-only state if desired, but for now forms are always editable */}
+                    </div>
+                    <div className="p-6 space-y-5">
+                         <form onSubmit={profileForm.handleSubmit(onProfileSubmit)}>
+                            <div className="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-text-secondary-light mb-1 uppercase tracking-wider">نام و نام خانوادگی</label>
+                                    <input
+                                        {...profileForm.register("fullName")}
+                                        className="w-full text-sm bg-gray-50 dark:bg-gray-900 border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary px-3 py-2"
+                                        type="text"
+                                    />
+                                     {profileForm.formState.errors.fullName && <p className="text-xs text-red-500 mt-1">{profileForm.formState.errors.fullName.message}</p>}
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-text-secondary-light mb-1 uppercase tracking-wider">کد ملی</label>
+                                    <input
+                                        {...profileForm.register("nationalCode")}
+                                        className="w-full text-sm bg-gray-100 dark:bg-gray-800 border-border-light dark:border-border-dark rounded-lg cursor-not-allowed text-text-secondary-light px-3 py-2"
+                                        disabled
+                                        type="text"
+                                    />
+                                </div>
+                            </div>
+                             <div className="mb-4">
+                                <label className="block text-[10px] font-bold text-text-secondary-light mb-1 uppercase tracking-wider">تاریخ تولد</label>
+                                <input
+                                    {...profileForm.register("birthDate")}
+                                    className="w-full text-sm bg-gray-50 dark:bg-gray-900 border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary px-3 py-2"
+                                    type="date"
+                                />
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-[10px] font-bold text-text-secondary-light mb-1 uppercase tracking-wider">شماره همراه</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        {...profileForm.register("phoneNumber")}
+                                        className="flex-1 text-sm bg-gray-50 dark:bg-gray-900 border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary text-left px-3 py-2"
+                                        dir="ltr"
+                                        type="text"
+                                    />
+                                    {/* Verification button is visual-only for now based on spec, logic not requested */}
+                                    <button type="button" className="px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-xs font-bold rounded-lg border border-emerald-200 dark:border-emerald-800">تأیید موبایل</button>
+                                </div>
+                                {profileForm.formState.errors.phoneNumber && <p className="text-xs text-red-500 mt-1">{profileForm.formState.errors.phoneNumber.message}</p>}
+                            </div>
+                            <div className="pt-2">
+                                <button
+                                    disabled={updateProfileMutation.isPending}
+                                    className="w-full py-2.5 bg-primary hover:bg-primary-dark text-white text-sm font-bold rounded-lg transition-colors shadow-sm shadow-emerald-200 dark:shadow-none disabled:opacity-70">
+                                    {updateProfileMutation.isPending ? "در حال ذخیره..." : "ذخیره تغییرات"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
 
-            <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">تاریخ تولد</label>
-                <div className="relative">
-                    <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">calendar_today</span>
-                    <input
-                        {...profileForm.register("birthDate")}
-                        type="date"
-                        className="w-full h-11 pr-10 pl-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                        disabled={updateProfileMutation.isPending}
-                    />
+                {/* Security and Login Card */}
+                <div className="bg-card-light dark:bg-card-dark rounded-xl border border-border-light dark:border-border-dark card-shadow flex flex-col">
+                    <div className="p-6 border-b border-border-light dark:border-border-dark flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 flex items-center justify-center">
+                                <span className="material-symbols-outlined">security</span>
+                            </div>
+                            <div>
+                                <h3 className="font-bold">امنیت و ورود</h3>
+                                <p className="text-[10px] text-text-secondary-light">گذرواژه و احراز هویت دومرحله‌ای</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="p-6 space-y-6">
+                        {/* Password Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-xs font-bold text-text-primary-light dark:text-text-primary-dark">گذرواژه</h4>
+                                <span className="text-[10px] text-text-secondary-light">آخرین تغییر: ۳ ماه پیش</span>
+                            </div>
+
+                            {!showPasswordChange ? (
+                                <div className="grid grid-cols-1 gap-3">
+                                    <div className="relative">
+                                        <input className="w-full text-sm bg-gray-50 dark:bg-gray-900 border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary pr-10 px-3 py-2" placeholder="••••••••" type="password" disabled/>
+                                        <span className="material-symbols-outlined absolute right-3 top-2.5 text-text-secondary-light text-xl">lock</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setShowPasswordChange(true)}
+                                        className="text-right text-xs text-primary font-medium hover:underline">
+                                        تغییر گذرواژه
+                                    </button>
+                                </div>
+                            ) : (
+                                <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg border border-border-light dark:border-border-dark space-y-3">
+                                     <div>
+                                        <label className="block text-[10px] font-bold text-text-secondary-light mb-1">گذرواژه فعلی</label>
+                                        <input
+                                            {...passwordForm.register("currentPassword")}
+                                            className="w-full text-sm bg-white dark:bg-gray-800 border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary px-3 py-2"
+                                            type="password"
+                                        />
+                                        {passwordForm.formState.errors.currentPassword && <p className="text-xs text-red-500 mt-1">{passwordForm.formState.errors.currentPassword.message}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-text-secondary-light mb-1">گذرواژه جدید</label>
+                                        <input
+                                            {...passwordForm.register("newPassword")}
+                                            className="w-full text-sm bg-white dark:bg-gray-800 border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary px-3 py-2"
+                                            type="password"
+                                        />
+                                        {passwordForm.formState.errors.newPassword && <p className="text-xs text-red-500 mt-1">{passwordForm.formState.errors.newPassword.message}</p>}
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-text-secondary-light mb-1">تکرار گذرواژه جدید</label>
+                                        <input
+                                            {...passwordForm.register("confirmPassword")}
+                                            className="w-full text-sm bg-white dark:bg-gray-800 border-border-light dark:border-border-dark rounded-lg focus:ring-primary focus:border-primary px-3 py-2"
+                                            type="password"
+                                        />
+                                        {passwordForm.formState.errors.confirmPassword && <p className="text-xs text-red-500 mt-1">{passwordForm.formState.errors.confirmPassword.message}</p>}
+                                    </div>
+                                    <div className="flex gap-2 justify-end pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setShowPasswordChange(false);
+                                                passwordForm.reset();
+                                            }}
+                                            className="px-3 py-1.5 text-xs text-text-secondary-light hover:bg-gray-200 dark:hover:bg-gray-700 rounded transition-colors"
+                                        >
+                                            انصراف
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            disabled={changePasswordMutation.isPending}
+                                            className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded shadow-sm hover:bg-primary-dark transition-colors disabled:opacity-70"
+                                        >
+                                            {changePasswordMutation.isPending ? "..." : "ذخیره"}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+
+                        <hr className="border-border-light dark:border-border-dark"/>
+
+                        {/* 2FA Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <h4 className="text-xs font-bold text-text-primary-light dark:text-text-primary-dark">احراز هویت دو مرحله‌ای (2FA)</h4>
+                                    <span className={`px-2 py-0.5 text-[9px] font-bold rounded-full ${profileData?.totpEnabled ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400" : "bg-gray-100 dark:bg-gray-800 text-gray-500"}`}>
+                                        {profileData?.totpEnabled ? "فعال" : "غیرفعال"}
+                                    </span>
+                                </div>
+                                <span className={`material-symbols-outlined text-lg ${profileData?.totpEnabled ? "text-green-500" : "text-gray-400"}`}>verified_user</span>
+                            </div>
+                            <p className="text-[11px] text-text-secondary-light leading-relaxed">
+                                برای امنیت بیشتر، در هر بار ورود علاوه بر رمز عبور، کدی به شماره همراه شما پیامک می‌شود (یا از طریق اپلیکیشن Authenticator).
+                            </p>
+
+                            {profileData?.totpEnabled ? (
+                                <div className="relative">
+                                    <input className="hidden peer" id="reset-2fa-trigger" type="checkbox"/>
+
+                                    {/* Confirmation Box (Shown when checkbox is checked) */}
+                                    <div className="hidden peer-checked:flex bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/40 p-4 rounded-lg flex-col gap-3" id="reset-confirmation">
+                                        <div className="flex gap-3">
+                                            <span className="material-symbols-outlined text-orange-600 text-xl">info</span>
+                                            <p className="text-xs text-orange-800 dark:text-orange-300 leading-normal">
+                                                با بازنشانی تنظیمات 2FA، شما از حساب کاربری خارج می‌شوید و باید مجدداً احراز هویت را راه‌اندازی کنید. آیا مطمئن هستید؟
+                                            </p>
+                                        </div>
+                                        <div className="flex justify-end gap-2">
+                                            <label className="px-3 py-1.5 text-[10px] font-bold text-text-secondary-light cursor-pointer hover:bg-gray-200/50 dark:hover:bg-gray-800 rounded" htmlFor="reset-2fa-trigger">انصراف</label>
+                                            <button
+                                                onClick={() => reset2FAMutation.mutate()}
+                                                disabled={reset2FAMutation.isPending}
+                                                className="px-3 py-1.5 bg-orange-600 text-white text-[10px] font-bold rounded shadow-sm hover:bg-orange-700 transition-colors disabled:opacity-70"
+                                            >
+                                                {reset2FAMutation.isPending ? "در حال انجام..." : "بله، بازنشانی"}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Actions (Hidden when checkbox is checked) */}
+                                    <div className="flex items-center justify-between gap-4 peer-checked:hidden" id="security-actions">
+                                        <label className="px-4 py-2 border border-border-light dark:border-border-dark text-text-secondary-light hover:bg-gray-50 dark:hover:bg-gray-800 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center gap-2" htmlFor="reset-2fa-trigger">
+                                            <span className="material-symbols-outlined text-sm">restart_alt</span>
+                                            بازنشانی 2FA
+                                        </label>
+                                        {/* Disable button is visual only per requirements for now, or could map to reset */}
+                                    </div>
+                                </div>
+                            ) : (
+                                 <button
+                                    onClick={() => router.push('/setup-2fa')}
+                                    className="w-full py-2 bg-primary hover:bg-primary-dark text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <span className="material-symbols-outlined text-sm">add_security</span>
+                                    فعال‌سازی 2FA
+                                </button>
+                            )}
+                        </div>
+
+                        <hr className="border-border-light dark:border-border-dark"/>
+
+                        {/* Active Sessions */}
+                        <div className="space-y-3">
+                            <h4 className="text-xs font-bold text-text-primary-light dark:text-text-primary-dark">نشست‌های فعال</h4>
+                            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-border-light dark:border-border-dark">
+                                <div className="flex items-center gap-3">
+                                    <span className="material-symbols-outlined text-text-secondary-light">desktop_windows</span>
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-bold">مرورگر فعلی</p>
+                                        <p className="text-[9px] text-text-secondary-light" dir="ltr">IP: (Current)</p>
+                                    </div>
+                                </div>
+                                <span className="text-[9px] font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 px-1.5 py-0.5 rounded">همین الان</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-          </div>
 
-          <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
-            <button
-              type="submit"
-              disabled={updateProfileMutation.isPending}
-              className="px-8 py-2.5 bg-primary hover:bg-primary-dark text-white font-medium rounded-lg shadow-lg shadow-primary/25 transition-all active:scale-[0.98] flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {updateProfileMutation.isPending ? "در حال ذخیره..." : "ذخیره تغییرات"}
-            </button>
-          </div>
-        </form>
-      </div>
-      )}
-
-      {/* Password Form */}
-      {activeTab === 'password' && (
-      <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8 transition-all">
-        <form onSubmit={passwordForm.handleSubmit(onPasswordSubmit)} className="space-y-6 max-w-lg">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">کلمه عبور فعلی</label>
-              <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
-                  <input
-                    type="password"
-                    {...passwordForm.register("currentPassword")}
-                    className="w-full h-11 pr-10 pl-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                    disabled={changePasswordMutation.isPending}
-                  />
-              </div>
-              {passwordForm.formState.errors.currentPassword && <p className="text-xs text-red-500">{passwordForm.formState.errors.currentPassword.message}</p>}
+            <div className="mt-8 flex items-center justify-between text-text-secondary-light">
+                <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-sm">support_agent</span>
+                    <span className="text-xs">نیاز به راهنمایی دارید؟ با پشتیبانی تماس بگیرید.</span>
+                </div>
+                <p className="text-[10px]" dir="ltr">v3.4.2-stable</p>
             </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">کلمه عبور جدید</label>
-              <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">key</span>
-                  <input
-                    type="password"
-                    {...passwordForm.register("newPassword")}
-                    className="w-full h-11 pr-10 pl-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                    disabled={changePasswordMutation.isPending}
-                  />
-              </div>
-              {passwordForm.formState.errors.newPassword && <p className="text-xs text-red-500">{passwordForm.formState.errors.newPassword.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">تکرار کلمه عبور جدید</label>
-              <div className="relative">
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">check_circle</span>
-                  <input
-                    type="password"
-                    {...passwordForm.register("confirmPassword")}
-                    className="w-full h-11 pr-10 pl-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all outline-none"
-                    disabled={changePasswordMutation.isPending}
-                  />
-              </div>
-              {passwordForm.formState.errors.confirmPassword && <p className="text-xs text-red-500">{passwordForm.formState.errors.confirmPassword.message}</p>}
-            </div>
-
-            <div className="flex justify-end pt-4">
-                <button
-                type="submit"
-                disabled={changePasswordMutation.isPending}
-                className="px-8 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-medium rounded-lg shadow-md transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                {changePasswordMutation.isPending ? "در حال تغییر..." : "تغییر کلمه عبور"}
-                </button>
-            </div>
-        </form>
-      </div>
-      )}
-
-      {/* 2FA Section */}
-      {activeTab === '2fa' && (
-      <div className="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6 md:p-8 transition-all">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-              <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-4">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center ${profileData?.totpEnabled ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-400'}`}>
-                          <span className="material-symbols-outlined text-2xl">verified_user</span>
-                      </div>
-                      <div>
-                          <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">وضعیت تایید دو مرحله‌ای</h3>
-                          <p className={`text-sm font-medium ${profileData?.totpEnabled ? 'text-emerald-600' : 'text-slate-500'}`}>
-                              {profileData?.totpEnabled ? 'فعال و محافظت شده' : 'غیرفعال'}
-                          </p>
-                      </div>
-                  </div>
-                  <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed mb-6">
-                      تایید دو مرحله‌ای (2FA) لایه امنیتی اضافه‌ای است که از دسترسی غیرمجاز به حساب کاربری شما جلوگیری می‌کند. در صورت فراموشی یا تغییر دستگاه، می‌توانید آن را بازنشانی کنید.
-                  </p>
-
-                  {profileData?.totpEnabled ? (
-                      <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4">
-                          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 mb-2">بازنشانی تنظیمات</h4>
-                          <p className="text-xs text-slate-500 mb-4">در صورت مفقودی تلفن همراه یا مشکل در ورود، می‌توانید تنظیمات را بازنشانی کرده و مجدداً فعال‌سازی کنید.</p>
-                          <button
-                            onClick={() => {
-                                if(confirm("آیا از بازنشانی تنظیمات امنیتی اطمینان دارید؟ این عمل قابل بازگشت نیست.")) {
-                                    reset2FAMutation.mutate();
-                                }
-                            }}
-                            className="text-red-600 hover:text-red-700 text-sm font-bold flex items-center gap-1 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                            disabled={reset2FAMutation.isPending}
-                          >
-                              <span className="material-symbols-outlined text-lg">history</span>
-                              {reset2FAMutation.isPending ? "در حال بازنشانی..." : "بازنشانی و غیرفعال‌سازی"}
-                          </button>
-                      </div>
-                  ) : (
-                      <button
-                        onClick={() => router.push('/setup-2fa')}
-                        className="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-lg shadow-lg shadow-primary/20 font-bold text-sm flex items-center gap-2 transition-all"
-                      >
-                          <span className="material-symbols-outlined">add_security</span>
-                          فعال‌سازی تایید دو مرحله‌ای
-                      </button>
-                  )}
-              </div>
-              <div className="hidden md:block w-1/3 opacity-80">
-                  <span className="material-symbols-outlined text-[150px] text-slate-200 dark:text-slate-700">security</span>
-              </div>
-          </div>
-      </div>
-      )}
-
+        </div>
     </div>
   );
 }

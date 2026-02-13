@@ -8,6 +8,9 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { authenticator } from "otplib";
 
+// Allow for some clock drift (30s window by default)
+authenticator.options = { window: 1 };
+
 const signInSchema = z.object({
   identifier: z.string(),
   password: z.string(),

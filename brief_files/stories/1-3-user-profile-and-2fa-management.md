@@ -1,6 +1,6 @@
 # Story 1.3: User Profile and 2FA Management
 
-Status: ready-for-dev
+Status: complete
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -64,6 +64,11 @@ Gemini 2.0 Flash
 - Verified Zod v4 migration.
 - Verified Sidebar and Header styling against mockups.
 - Confirmed Profile page functionality (Update Profile, Change Password, Reset 2FA).
+- **Refinement:**
+    - Refactored `ProfileView` to match the `1-3-user-profile-and-2fa-management-ui` mockup pixel-perfectly using Tailwind CSS.
+    - Switched from tabbed view to card-based layout (User Information, Security & Login).
+    - Implemented secure 2FA reset that forces logout, ensuring the user must re-authenticate and re-setup 2FA immediately.
+    - Added "Change Password" inline form with confirmation fields.
 
 ### Completion Notes List
 
