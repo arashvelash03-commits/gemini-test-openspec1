@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -18,7 +18,8 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [requireTotp, setRequireTotp] = useState(false);
-  const [credentials, setCredentials] = useState({ identifier: "", password: "" });
+  const [identifier, setIdentifier] = useState("");
+  const passwordRef = useRef("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,8 +29,13 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData);
 
+    if (!requireTotp) {
+        passwordRef.current = data.password as string;
+    }
+
     const submissionData = requireTotp ? {
-        ...credentials,
+        identifier: identifier,
+        password: passwordRef.current,
         totpCode: data.totpCode
     } : data;
 
@@ -54,11 +60,10 @@ export default function LoginForm() {
 
         if (errorMsg.includes("TOTP_REQUIRED") || errorCode === "TOTP_REQUIRED") {
             setRequireTotp(true);
-            setCredentials({
-                identifier: result.data.identifier as string,
-                password: result.data.password as string,
-            });
+            setIdentifier(result.data.identifier as string);
             setError("");
+        } else if (errorMsg.includes("TOTP_SETUP_REQUIRED") || errorCode === "TOTP_SETUP_REQUIRED") {
+            router.push("/setup-2fa");
         } else if (errorMsg.includes("INVALID_TOTP") || errorCode === "INVALID_TOTP") {
             setError("کد تایید اشتباه است");
         } else if (errorMsg === "Configuration") {
@@ -69,7 +74,6 @@ export default function LoginForm() {
         }
       } else {
         router.push("/");
-        router.refresh();
       }
     } catch (err) {
       console.error(err);
@@ -185,7 +189,7 @@ export default function LoginForm() {
                     type="button"
                     onClick={() => {
                         setRequireTotp(false);
-                        setCredentials({ identifier: "", password: "" });
+                        setIdentifier("");
                         setError("");
                     }}
                     className="w-full text-sm text-slate-500 hover:text-primary mt-4 transition-colors flex items-center justify-center gap-1"
@@ -200,7 +204,7 @@ export default function LoginForm() {
                 <div className="mt-8 pt-6 border-t border-slate-50 text-center">
                 <Link
                     className="text-sm text-slate-500 hover:text-primary transition-colors font-medium"
-                    href="#"
+                    href="/forgot-password"
                 >
                     فراموشی کلمه عبور؟
                 </Link>
