@@ -13,18 +13,28 @@ export function Sidebar() {
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + "/");
 
   const links = [
+    // Doctor & Clerk & Admin
     {
       name: "داشبورد",
       href: "/dashboard",
       icon: "dashboard",
       roles: ["admin", "doctor", "clerk", "patient"],
     },
+    // Doctor & Clerk (Patient Management)
+    {
+      name: "لیست بیماران",
+      href: "/patients",
+      icon: "personal_injury", // or 'groups' or 'ward'
+      roles: ["doctor", "clerk"],
+    },
+    // Admin Only
     {
       name: "مدیریت کاربران",
       href: "/admin/users",
-      icon: "group",
+      icon: "manage_accounts",
       roles: ["admin"],
     },
+    // Profile (Everyone) - Though usually accessed via Header/Settings too
     {
       name: "پروفایل",
       href: "/profile",
@@ -68,7 +78,9 @@ export function Sidebar() {
           </div>
           <div className="flex-1 overflow-hidden">
             <p className="text-sm font-bold text-slate-800 truncate">{session?.user?.name || "کاربر"}</p>
-            <p className="text-xs text-slate-500 truncate capitalize">{role}</p>
+            <p className="text-xs text-slate-500 truncate capitalize">
+                {role === 'doctor' ? 'پزشک' : role === 'clerk' ? 'منشی' : role === 'admin' ? 'مدیر' : role}
+            </p>
           </div>
         </div>
         <LogoutButton className="w-full justify-center border border-red-100 hover:border-red-200 bg-red-50 hover:bg-red-100" />
