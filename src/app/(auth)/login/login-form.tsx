@@ -18,7 +18,7 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [requireTotp, setRequireTotp] = useState(false);
-  const [credentials, setCredentials] = useState({ identifier: "", password: "" });
+  // Removed credentials state to avoid storing plaintext password
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -28,12 +28,8 @@ export default function LoginForm() {
     const formData = new FormData(event.currentTarget);
     const data = Object.fromEntries(formData);
 
-    const submissionData = requireTotp ? {
-        ...credentials,
-        totpCode: data.totpCode
-    } : data;
-
-    const result = schema.safeParse(submissionData);
+    // Use data directly from formData
+    const result = schema.safeParse(data);
     if (!result.success) {
       setError(result.error.errors[0].message);
       setLoading(false);
@@ -49,23 +45,25 @@ export default function LoginForm() {
       });
 
       if (res?.error) {
-        const errorMsg = res.error;
-        const errorCode = res.code;
-
-        if (errorMsg.includes("TOTP_REQUIRED") || errorCode === "TOTP_REQUIRED") {
+        // Use custom error codes from next-auth
+        switch (res.error) {
+          case "TOTP_REQUIRED":
             setRequireTotp(true);
-            setCredentials({
-                identifier: result.data.identifier as string,
-                password: result.data.password as string,
-            });
+            // No need to store credentials in state, as identifier and password are re-submitted with totpCode
             setError("");
-        } else if (errorMsg.includes("INVALID_TOTP") || errorCode === "INVALID_TOTP") {
+            break;
+          case "INVALID_TOTP":
             setError("کد تایید اشتباه است");
-        } else if (errorMsg === "Configuration") {
-             // Fallback for configuration errors (masked by NextAuth sometimes)
-            setError("خطای سیستم. لطفا مجددا تلاش کنید.");
-        } else {
+            break;
+          case "INVALID_CREDENTIALS":
             setError("اطلاعات وارد شده صحیح نمی‌باشد");
+            break;
+          case "TOTP_SETUP_ERROR":
+            setError("خطای پیکربندی 2FA. لطفا با پشتیبانی تماس بگیرید.");
+            break;
+          default:
+            setError("خطایی رخ داده است. لطفا مجددا تلاش کنید.");
+            break;
         }
       } else {
         router.push("/");
@@ -166,7 +164,6 @@ export default function LoginForm() {
                       maxLength={6}
                       disabled={loading}
                       autoFocus
-                      onChange={handleTotpChange}
                     />
                   </div>
                 </div>
@@ -185,7 +182,7 @@ export default function LoginForm() {
                     type="button"
                     onClick={() => {
                         setRequireTotp(false);
-                        setCredentials({ identifier: "", password: "" });
+                        // No need to reset credentials as they are not stored in state
                         setError("");
                     }}
                     className="w-full text-sm text-slate-500 hover:text-primary mt-4 transition-colors flex items-center justify-center gap-1"
@@ -200,7 +197,7 @@ export default function LoginForm() {
                 <div className="mt-8 pt-6 border-t border-slate-50 text-center">
                 <Link
                     className="text-sm text-slate-500 hover:text-primary transition-colors font-medium"
-                    href="#"
+                    href="/forgot-password" // Made functional
                 >
                     فراموشی کلمه عبور؟
                 </Link>
