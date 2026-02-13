@@ -1,6 +1,6 @@
 # Story 1.1: user-login-with-phone-number-national-code-and-password
 
-Status: complete
+Status: in-progress
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -78,11 +78,19 @@ Gemini 2.0 Flash
 ### File List
 
 - `package.json`
+- `pnpm-lock.yaml`
 - `drizzle.config.ts`
 - `src/app/(auth)/login/login-form.tsx`
 - `src/app/(auth)/login/page.tsx`
+- `src/app/(auth)/forgot-password/page.tsx`
 - `src/app/api/auth/[...nextauth]/route.ts`
 - `src/app/api/trpc/[trpc]/route.ts`
+- `src/app/_trpc/client.ts`
+- `src/app/_trpc/provider.tsx`
+- `src/app/favicon.ico`
+- `src/app/globals.css`
+- `src/app/layout.tsx`
+- `src/app/page.tsx`
 - `src/components/ui/button.tsx`
 - `src/components/ui/card.tsx`
 - `src/components/ui/input.tsx`
@@ -93,11 +101,13 @@ Gemini 2.0 Flash
 - `src/lib/utils.ts`
 - `src/server/context.ts`
 - `src/server/index.ts`
-- `src/server/routers/auth.ts`
 - `src/server/routers/totp.ts`
 - `src/server/trpc.ts`
 - `src/types/next-auth.d.ts`
-- `scripts/seed.js`
+- `tsconfig.json`
 - `drizzle/0000_open_maria_hill.sql`
-- `drizzle/0001_simple_phil_sheldon.sql`
-- `drizzle/0002_right_felicia_hardy.sql`
+- `drizzle/meta/0000_snapshot.json`
+- `drizzle/meta/_journal.json`
+- `verification/login_page.png`
+- `verification/verify_login.py`
+- `dev.log`

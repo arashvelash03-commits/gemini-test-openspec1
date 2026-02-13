@@ -14,6 +14,13 @@ const signInSchema = z.object({
   totpCode: z.string().optional(),
 });
 
+class TotpSetupRequiredError extends CredentialsSignin {
+  constructor() {
+    super("TOTP_SETUP_REQUIRED");
+    this.code = "TOTP_SETUP_REQUIRED";
+  }
+}
+
 class TotpRequiredError extends CredentialsSignin {
   constructor() {
     super("TOTP_REQUIRED");
@@ -61,16 +68,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ),
           });
 
-          if (!user || !user.passwordHash) return null;
+          // To prevent user enumeration attacks, we'll use a dummy hash if the user is not found.
+          // This ensures that the bcrypt.compare function takes a similar amount of time for both
+          // existing and non-existing users.
+          const passwordHash = user?.passwordHash ?? "$2a$10$GN3s.dG.E2N5b2w/1s5k.uN0J0s5g5g5g5g5g5g5g5g5g5g5g5g5g";
+          const passwordMatch = await bcrypt.compare(password, passwordHash);
 
-          const passwordMatch = await bcrypt.compare(password, user.passwordHash);
-          if (!passwordMatch) return null;
+          if (!user || !passwordMatch) {
+            return null;
+          }
 
           if (user.totpEnabled) {
+            if (!user.totpSecret) {
+              throw new TotpSetupRequiredError();
+            }
             if (!totpCode || totpCode.trim() === "" || totpCode === "undefined" || totpCode === "null") {
               throw new TotpRequiredError();
             }
-            if (!user.totpSecret) throw new TotpSetupError();
 
             const isValidTotp = authenticator.check(totpCode, user.totpSecret);
             if (!isValidTotp) {

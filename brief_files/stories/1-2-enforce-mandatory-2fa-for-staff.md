@@ -20,19 +20,19 @@ so that sensitive patient data is protected with an additional layer of security
 
 ## Tasks / Subtasks
 
-- [ ] **Backend:** Implement 2FA logic in the authentication flow.
-  - [ ] Generate a secret key for the user and store it securely.
-  - [ ] Generate a QR code for the user to scan with their authenticator app.
-  - [ ] Verify the TOTP code provided by the user.
-  - [ ] Add a field to the user model to track 2FA status (enabled/disabled).
-- [ ] **Frontend:** Create the UI for 2FA setup and verification.
-  - [ ] Display the QR code and secret key during setup.
-  - [ ] Provide an input field for the user to enter the 2FA code.
-  - [ ] Handle API errors and display appropriate messages.
-- [ ] **Integration:** Connect the frontend and backend.
-  - [ ] Create a tRPC endpoint to enable/disable 2FA.
-  - [ ] Create a tRPC endpoint to verify the 2FA code during login.
-- [ ] **Documentation:** Update documentation to reflect the new 2FA requirement for staff.
+- [x] **Backend:** Implement 2FA logic in the authentication flow.
+  - [x] Generate a secret key for the user and store it securely.
+  - [x] Generate a QR code for the user to scan with their authenticator app.
+  - [x] Verify the TOTP code provided by the user.
+  - [x] Add a field to the user model to track 2FA status (enabled/disabled).
+- [x] **Frontend:** Create the UI for 2FA setup and verification.
+  - [x] Display the QR code and secret key during setup.
+  - [x] Provide an input field for the user to enter the 2FA code.
+  - [x] Handle API errors and display appropriate messages.
+- [x] **Integration:** Connect the frontend and backend.
+  - [x] Create a tRPC endpoint to enable/disable 2FA.
+  - [x] Create a tRPC endpoint to verify the 2FA code during login.
+- [x] **Documentation:** Update documentation to reflect the new 2FA requirement for staff.
 
 ## Dev Notes
 
