@@ -1,6 +1,6 @@
 # Story 1.1: user-login-with-phone-number-national-code-and-password
 
-Status: in-progress
+Status: complete
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -74,6 +74,9 @@ Gemini 2.0 Flash
         - `lib/auth.ts` verifies the TOTP code if enabled for the user.
     - Downgraded `otplib` to v12 to avoid ESM/CJS compatibility issues in the Next.js server environment.
     - Created database migration scripts (`db:generate`, `db:migrate`, `db:seed`) to facilitate setup.
+    - **Login Flow Refinements:**
+        - Refactored `login-form.tsx` to preserve `identifier` state between password and TOTP steps, resolving flaky login behavior.
+        - Added `authenticator.options = { window: 1 }` to `src/lib/auth.ts` to allow for a 30-second clock drift window during TOTP verification, significantly improving reliability.
 
 ### File List
 

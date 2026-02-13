@@ -19,6 +19,7 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [requireTotp, setRequireTotp] = useState(false);
   const [identifier, setIdentifier] = useState("");
+  const [totpCode, setTotpCode] = useState("");
   const passwordRef = useRef("");
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -36,7 +37,7 @@ export default function LoginForm() {
     const submissionData = requireTotp ? {
         identifier: identifier,
         password: passwordRef.current,
-        totpCode: data.totpCode
+        totpCode: totpCode
     } : data;
 
     const result = schema.safeParse(submissionData);
@@ -66,6 +67,8 @@ export default function LoginForm() {
             router.push("/setup-2fa");
         } else if (errorMsg.includes("INVALID_TOTP") || errorCode === "INVALID_TOTP") {
             setError("کد تایید اشتباه است");
+            // Clear totpCode to allow re-entry easily
+            setTotpCode("");
         } else if (errorMsg === "Configuration") {
              // Fallback for configuration errors (masked by NextAuth sometimes)
             setError("خطای سیستم. لطفا مجددا تلاش کنید.");
@@ -85,7 +88,7 @@ export default function LoginForm() {
 
   const handleTotpChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value.replace(/[^0-9]/g, "").slice(0, 6);
-      e.target.value = val;
+      setTotpCode(val);
   };
 
   return (
@@ -170,6 +173,7 @@ export default function LoginForm() {
                       maxLength={6}
                       disabled={loading}
                       autoFocus
+                      value={totpCode}
                       onChange={handleTotpChange}
                     />
                   </div>
@@ -190,6 +194,7 @@ export default function LoginForm() {
                     onClick={() => {
                         setRequireTotp(false);
                         setIdentifier("");
+                        setTotpCode("");
                         setError("");
                     }}
                     className="w-full text-sm text-slate-500 hover:text-primary mt-4 transition-colors flex items-center justify-center gap-1"
