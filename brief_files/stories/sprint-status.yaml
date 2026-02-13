@@ -42,10 +42,10 @@ story_location: C:\Users\FATER\Desktop\reyzone\gemini-test\_bmad-output/implemen
 
 development_status:
   epic-1: in-progress
-  1-1-user-login-with-phone-number-national-code-and-password: ready-for-dev
-  1-2-enforce-mandatory-2fa-for-staff: ready-for-dev
-  1-3-user-profile-and-2fa-management: ready-for-dev
-  1-4-admin-led-user-provisioning: ready-for-dev
+  1-1-user-login-with-phone-number-national-code-and-password: review
+  1-2-enforce-mandatory-2fa-for-staff: review
+  1-3-user-profile-and-2fa-management: review
+  1-4-admin-led-user-provisioning: review
   1-5-doctor-led-user-provisioning: ready-for-dev
   1-6-clerk-led-patient-provisioning: ready-for-dev
   1-7-secure-audit-logging: ready-for-dev

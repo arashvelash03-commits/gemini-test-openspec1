@@ -1,6 +1,6 @@
 # Story 1.3: User Profile and 2FA Management
 
-Status: complete
+Status: review
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
