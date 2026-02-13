@@ -1,6 +1,6 @@
 # Story 1.3: User Profile and 2FA Management
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -36,6 +36,14 @@ so that my account information is accurate and secure.
   - [x] Implement the 2FA reset flow (redirects to setup).
 - [x] **Integration:** Connect frontend components to the backend APIs.
 - [x] **Security:** Ensure all profile update operations are secure and authorized.
+
+## Code Review
+
+- **Status:** Complete
+- **Findings:**
+    - Profile update logic verified.
+    - **Fixed Issue:** Added uniqueness check for `nationalCode` in `updateProfile` to prevent duplicate entries.
+    - Password change and 2FA reset logic are correct.
 
 ## Dev Notes
 
