@@ -14,13 +14,6 @@ const signInSchema = z.object({
   totpCode: z.string().optional(),
 });
 
-// Custom Error Classes for specific, self-documenting error handling
-class InvalidCredentialsError extends CredentialsSignin {
-  constructor() {
-    super("INVALID_CREDENTIALS");
-    this.code = "INVALID_CREDENTIALS";
-  }
-}
 class TotpRequiredError extends CredentialsSignin {
   constructor() {
     super("TOTP_REQUIRED");
@@ -52,8 +45,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         totpCode: { label: "TOTP Code", type: "text" },
       },
       authorize: async (credentials) => {
-        const parsedCredentials = signInSchema.safeParse(credentials);
-        if (!parsedCredentials.success) return null;
+        const parsedCredentials = await signInSchema.safeParseAsync(credentials);
+
+        if (!parsedCredentials.success) {
+            return null;
+        }
 
         const { identifier, password, totpCode } = parsedCredentials.data;
 
@@ -65,50 +61,39 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             ),
           });
 
-          // SECURITY: Constant-time comparison to prevent user enumeration.
-          // 1. If user not found, create a dummy hash to compare against.
-          // 2. If user found, use their actual hash.
-          const hashToCompare = user?.passwordHash ?? await bcrypt.hash("dummyPassword", 10);
-          const passwordMatch = await bcrypt.compare(password, hashToCompare);
+          if (!user || !user.passwordHash) return null;
 
-          if (!user || !passwordMatch) {
-            throw new InvalidCredentialsError();
-          }
+          const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+          if (!passwordMatch) return null;
 
-          // Handle TOTP verification
           if (user.totpEnabled) {
-            if (!totpCode) {
+            if (!totpCode || totpCode.trim() === "" || totpCode === "undefined" || totpCode === "null") {
               throw new TotpRequiredError();
             }
-            if (!user.totpSecret) {
-              // This case indicates a server-side configuration issue.
-              console.error(`User ${user.id} has TOTP enabled but no secret.`);
-              throw new TotpSetupError();
-            }
+            if (!user.totpSecret) throw new TotpSetupError();
 
             const isValidTotp = authenticator.check(totpCode, user.totpSecret);
             if (!isValidTotp) {
-              throw new InvalidTotpError();
+                throw new InvalidTotpError();
             }
           }
 
-          // Return a safe user object for the session
           return {
             id: user.id,
             name: user.fullName,
             role: user.role,
-            totpEnabled: user.totpEnabled ?? false,
+            totpEnabled: user.totpEnabled || false,
           };
         } catch (error) {
-          if (error instanceof CredentialsSignin) {
-            // Re-throw custom auth errors to be caught by the UI
-            throw error;
-          }
-          // Log unexpected errors and throw a generic credentials error
-          console.error("Authorize error:", error);
-          throw new InvalidCredentialsError();
+           if (error instanceof CredentialsSignin) {
+               throw error;
+           }
+           // Fallback to null for unknown errors to prevent crashing
+           console.error("Authorize error:", error);
+           return null;
         }
       },
     }),
   ],
+  // Standard logging configuration if needed, generally default is fine for dev
 });

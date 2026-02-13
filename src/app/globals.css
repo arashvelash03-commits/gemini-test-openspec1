@@ -8,9 +8,36 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #10b981;
+
+  /* Primary Colors */
+  --color-primary: #10b77f;
+  --color-primary-light: #d1fae5;
   --color-primary-dark: #059669;
-  --color-background-light: #f3f4f6;
+
+  /* Background Colors */
+  --color-background-light: #f6f8f7;
+  --color-background-dark: #10221c;
+
+  /* Card Colors */
+  --color-card-light: #ffffff;
+  --color-card-dark: #2d3135;
+
+  /* Border Colors */
+  --color-border-light: #e5e7eb;
+  --color-border-dark: #444746;
+
+  /* Text Colors */
+  --color-text-primary-light: #1e293b;
+  --color-text-primary-dark: #e2e8f0;
+  --color-text-secondary-light: #64748b;
+  --color-text-secondary-dark: #94a3b8;
+
+  /* Status Colors */
+  --color-status-current: #10b981;
+  --color-status-arrived: #f97316;
+  --color-status-scheduled: #6b7280;
+
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-vazir: var(--font-vazirmatn), sans-serif;
@@ -25,6 +52,11 @@
 
 body {
   background: var(--color-background-light);
-  color: #1e293b; /* slate-800 approx */
+  color: var(--color-text-primary-light);
   font-family: var(--font-vazir);
+}
+
+.dark body {
+  background: var(--color-background-dark);
+  color: var(--color-text-primary-dark);
 }

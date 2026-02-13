@@ -13,9 +13,9 @@ import {
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
-export const user_role_enum = pgEnum("user_role", ["doctor", "clerk", "patient", "admin"]);
-export const fhir_gender_enum = pgEnum("fhir_gender", ["male", "female", "other", "unknown"]);
-export const fhir_status_enum = pgEnum("fhir_status", ["active", "inactive", "error"]);
+export const userRoleEnum = pgEnum("user_role", ["doctor", "clerk", "patient", "admin"]);
+export const fhirGenderEnum = pgEnum("fhir_gender", ["male", "female", "other", "unknown"]);
+export const fhirStatusEnum = pgEnum("fhir_status", ["active", "inactive", "error"]);
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -23,11 +23,11 @@ export const users = pgTable("users", {
   phoneNumber: text("phone_number"), // Not unique
   passwordHash: text("password_hash"),
   createdBy: uuid("created_by"),
-  role: user_role_enum("role").default("patient").notNull(),
+  role: userRoleEnum("role").default("patient").notNull(),
   fullName: text("full_name"),
-  gender: fhir_gender_enum("gender"),
+  gender: fhirGenderEnum("gender"),
   birthDate: date("birth_date"),
-  status: fhir_status_enum("status").default("active"),
+  status: fhirStatusEnum("status").default("active"),
   resourceType: text("resource_type").notNull(), // CHECK constraint not directly supported in column def
   fhirData: jsonb("fhir_data").default({}).notNull(),
   totpSecret: text("totp_secret"),
