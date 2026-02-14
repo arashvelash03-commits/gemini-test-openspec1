@@ -1,6 +1,13 @@
 import { defineConfig } from "drizzle-kit";
 import * as dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
 
+// Load .env.local first (if exists)
+const envLocalPath = path.resolve(process.cwd(), ".env.local");
+if (fs.existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath });
+}
 dotenv.config({ path: ".env" });
 
 if (!process.env.DATABASE_URL) {

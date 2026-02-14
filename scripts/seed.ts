@@ -2,6 +2,13 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load .env.local if exists
+const envLocalPath = path.resolve(process.cwd(), '.env.local');
+dotenv.config({ path: envLocalPath });
+dotenv.config();
 
 async function seed() {
   console.log("Seeding database...");
