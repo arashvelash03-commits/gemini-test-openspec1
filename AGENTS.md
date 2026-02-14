@@ -6,7 +6,7 @@
 > **You are strictly forbidden from deviating from the patterns, constraints, and decisions recorded in these files.**
 
 ## 1. The Architecture Constitution
-**File:** `brief_files/architecture.md`
+**File:** `_bmad-output\planning-artifacts/architecture.md`
 
 **You must strictly adhere to:**
 
@@ -32,16 +32,16 @@
 * **Naming Conventions:** `snake_case` for DB, `camelCase` for TS.
 
 ## 2. The UX & UI Specification
-**File:** `brief_files/ux-design-specification.md`
+**File:** `_bmad-output\planning-artifacts/ux-design-specification.md`
 
 **You must strictly adhere to:**
-* **Visual Truth:** The `.png` files in `brief_files/ui-refs/` are the absolute visual target.
-* **Implementation Truth:** The `.html` files in `brief_files/ui-refs/` are the source for Tailwind utility classes.
+* **Visual Truth:** The `.png` files in `_bmad-output\planning-artifacts/ui-refs/` are the absolute visual target.
+* **Implementation Truth:** The `.html` files in `_bmad-output\planning-artifacts/ui-refs/` are the source for Tailwind utility classes.
 * **Design System:** Tailwind CSS v4 usage (no config file, `@theme` in CSS).
 * **Component Strategy:** Use the specific custom components (e.g., "Patient Queue Card") defined in the spec.
 
 ## 3. The Project Epics & Requirements
-**File:** `brief_files/epics.md`
+**File:** `_bmad-output\planning-artifacts/epics.md`
 
 **You must strictly adhere to:**
 * **Requirements:** Ensure every line of code maps to a specific User Story or Functional Requirement (FR).
@@ -52,7 +52,7 @@
 
 ### How to Execute a Task (BMAD Workflow)
 
-1.  **Read the Story:** Locate the active story file in `.bmad/stories/` (e.g., `1-1-user-login...md`). and find mockups of that story from `brief_files/ui-refs/` (e.g., `1-2-enforce-mandatory-2fa-for-staff-ui.html`, `1-2-enforce-mandatory-2fa-for-staff-ui.png`).
+1.  **Read the Story:** Locate the active story file in `_bmad-output\implementation-artifacts` (e.g., `1-1-user-login...md`). and find mockups of that story from `_bmad-output\planning-artifacts/ui-refs/` (e.g., `1-2-enforce-mandatory-2fa-for-staff-ui.html`, `1-2-enforce-mandatory-2fa-for-staff-ui.png`).
 2.  **Cross-Reference:** Check the **Dev Notes** in that story file against `architecture.md` to ensure no conflicts.
 3.  **Implement:** Write code that satisfies the story's Acceptance Criteria while following the patterns in `architecture.md`.
 4.  **Verify UI:** Compare your generated UI code against the constraints in `ux-design-specification.md`.

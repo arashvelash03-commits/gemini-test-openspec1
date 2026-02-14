@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>آرشیو مراجعات - پورتال بیمار</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#10b981", 
+              "primary-dark": "#059669",
+              "background-light": "#f3f4f6", 
+              "background-dark": "#111827", 
+              "card-light": "#ffffff",
+              "card-dark": "#1f2937", 
+              "border-light": "#e5e7eb",
+              "border-dark": "#374151",
+              "text-primary-light": "#111827",
+              "text-primary-dark": "#f9fafb",
+              "text-secondary-light": "#6b7280",
+              "text-secondary-dark": "#9ca3af",
+            },
+            fontFamily: {
+              display: ["Vazirmatn", "Inter", "sans-serif"],
+              sans: ["Vazirmatn", "Inter", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.5rem",
+              lg: "0.75rem",
+              xl: "1rem",
+            },
+          },
+        },
+      };
+    </script>
+<style type="text/tailwindcss">
+        @layer base {
+            body {
+                font-family: 'Vazirmatn', 'Inter', sans-serif;
+            }
+        }
+        #expanded-header-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
+            opacity: 0;
+        }
+        #header-expander:checked ~ #expanded-header-content {
+            max-height: 800px;
+            opacity: 1;
+        }
+        #header-expander:checked ~ div .expand-icon {
+            transform: rotate(180deg);
+        }
+        .card-table-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .dark .card-table-row {
+            border-bottom: 1px solid #374151;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d1d5db;
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-primary-light dark:text-text-primary-dark min-h-screen flex flex-col transition-colors duration-200">
+<header class="bg-card-light dark:bg-card-dark border-b border-border-light dark:border-border-dark flex-none z-30 shadow-sm w-full relative">
+<input class="hidden" id="header-expander" type="checkbox"/>
+<div class="w-full mx-auto">
+<div class="flex flex-col md:flex-row items-center h-auto md:h-16 gap-4 md:gap-0 py-3 md:py-0">
+<div class="flex items-center gap-4 flex-none lg:w-80 px-6 border-l border-border-light dark:border-border-dark h-[70%] my-auto">
+<div class="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-lg shadow-sm">
+                    A
+                </div>
+<div class="flex flex-col justify-center">
+<div class="flex items-baseline gap-2">
+<h1 class="text-base font-bold text-text-primary-light dark:text-text-primary-dark whitespace-nowrap">آقای احمدی</h1>
+<span class="text-[10px] text-text-secondary-light dark:text-text-secondary-dark" dir="ltr">Stage IIA</span>
+</div>
+<div class="flex items-center gap-2 text-[10px] text-text-secondary-light dark:text-text-secondary-dark">
+<span class="opacity-80">تشخیص:</span>
+<span dir="ltr">Invasive Ductal Carcinoma</span>
+</div>
+</div>
+</div>
+<div class="hidden md:flex flex-1 items-center px-6 gap-3 overflow-hidden">
+<div class="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-full border border-emerald-100 dark:border-emerald-800">
+<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+<span class="text-xs font-medium text-emerald-800 dark:text-emerald-300">درمان فعال: AC-T Chemo</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] text-text-secondary-light" dir="ltr">ER+</span>
+<span class="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-[10px] text-text-secondary-light" dir="ltr">PR-</span>
+</div>
+</div>
+<div class="flex-none px-6">
+<label class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-light dark:border-border-dark hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors group" for="header-expander">
+<span class="text-xs font-medium text-text-secondary-light dark:text-text-secondary-dark">جزئیات پرونده</span>
+<span class="material-symbols-outlined text-[18px] expand-icon transition-transform duration-300 text-text-secondary-light">expand_more</span>
+</label>
+</div>
+</div>
+</div>
+<div class="w-full bg-gray-50 dark:bg-gray-900 border-t border-border-light dark:border-border-dark shadow-inner" id="expanded-header-content">
+<div class="p-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-7xl mx-auto">
+<div class="bg-white dark:bg-card-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="flex items-center justify-between p-3 border-b border-border-light dark:border-border-dark border-r-4 border-r-emerald-500">
+<h4 class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">اطلاعات پایه</h4>
+<span class="material-symbols-outlined text-emerald-500 text-sm">info</span>
+</div>
+<div class="p-3 text-[11px] space-y-2">
+<div class="card-table-row"><span class="text-text-secondary-light">شماره پرونده</span><span class="font-semibold" dir="ltr">40020</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">کد ملی</span><span class="font-semibold" dir="ltr">2249124124</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">نوع بیماری</span><span class="font-semibold">Oncology</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">شکایت اصلی</span><span class="font-semibold">توده پستان</span></div>
+</div>
+</div>
+<div class="bg-white dark:bg-card-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="flex items-center justify-between p-3 border-b border-border-light dark:border-border-dark border-r-4 border-r-emerald-500">
+<h4 class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">پاتولوژی</h4>
+<span class="material-symbols-outlined text-emerald-500 text-sm">biotech</span>
+</div>
+<div class="p-3 text-[11px] space-y-2">
+<div class="card-table-row"><span class="text-text-secondary-light">Histology</span><span class="font-semibold">IDC</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">Grade</span><span class="font-semibold">2</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">LVI</span><span class="font-semibold text-red-500">Negative</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">Markers</span><span class="font-semibold text-green-600">ER+/PR-</span></div>
+</div>
+</div>
+<div class="bg-white dark:bg-card-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="flex items-center justify-between p-3 border-b border-border-light dark:border-border-dark border-r-4 border-r-emerald-500">
+<h4 class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">تصویربرداری</h4>
+<span class="material-symbols-outlined text-emerald-500 text-sm">radiology</span>
+</div>
+<div class="p-3 text-[11px] space-y-2">
+<div class="card-table-row"><span class="text-text-secondary-light">اندازه توده</span><span class="font-semibold" dir="ltr">3.1 cm</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">BIRADS</span><span class="font-semibold" dir="ltr">4c</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">Calcification</span><span class="font-semibold">Pleomorphic</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">Nodal Status</span><span class="font-semibold">N1 (Single)</span></div>
+</div>
+</div>
+<div class="bg-white dark:bg-card-dark rounded-lg shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="flex items-center justify-between p-3 border-b border-border-light dark:border-border-dark border-r-4 border-r-emerald-500">
+<h4 class="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase">آخرین آزمایشات</h4>
+<span class="material-symbols-outlined text-emerald-500 text-sm">lab_panel</span>
+</div>
+<div class="p-3 text-[11px] space-y-2 h-[120px] overflow-y-auto custom-scrollbar">
+<div class="card-table-row"><span class="text-text-secondary-light">WBC</span><span class="font-semibold">6.4</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">HB</span><span class="font-semibold">11.2</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">PLT</span><span class="font-semibold">245</span></div>
+<div class="card-table-row"><span class="text-text-secondary-light">CEA</span><span class="font-semibold">2.1</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<div>
+<h2 class="text-2xl font-bold text-text-primary-light dark:text-text-primary-dark">آرشیو مراجعات و خدمات</h2>
+<p class="text-sm text-text-secondary-light mt-1">لیست تمامی مشاوره‌ها، آزمایشات و تصویربرداری‌های انجام شده</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center gap-2 px-4 py-2 bg-white dark:bg-card-dark border border-border-light dark:border-border-dark rounded-lg text-sm hover:bg-gray-50 transition-colors">
+<span class="material-symbols-outlined text-sm">filter_list</span>
+<span>فیلتر</span>
+</button>
+<button class="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm hover:bg-emerald-700 transition-colors">
+<span class="material-symbols-outlined text-sm">download</span>
+<span>خروجی PDF</span>
+</button>
+</div>
+</div>
+<div class="bg-white dark:bg-card-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-right border-collapse">
+<thead>
+<tr class="bg-gray-50 dark:bg-gray-800/50 text-[11px] uppercase tracking-wider text-text-secondary-light font-bold border-b border-border-light dark:border-border-dark">
+<th class="px-6 py-4">تاریخ مراجعه</th>
+<th class="px-6 py-4">کلینیک / بخش</th>
+<th class="px-6 py-4">کد پیگیری</th>
+<th class="px-6 py-4">پزشک معالج</th>
+<th class="px-6 py-4">خدمات تجویز شده</th>
+<th class="px-6 py-4 text-center">عملیات</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark">
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark">۱۶ بهمن ۱۴۰۲</span>
+<span class="text-[10px] text-text-secondary-light">۱۰:۳۰ صبح</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium">کلینیک انکولوژی پستان</td>
+<td class="px-6 py-4 text-sm font-mono text-text-secondary-light" dir="ltr">VIS-88124</td>
+<td class="px-6 py-4 text-sm">دکتر محمدی</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold border border-blue-100 dark:border-blue-800">LAB</span>
+<span class="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-100 dark:border-indigo-800">MRI</span>
+<span class="px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800">Rx</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<a class="text-emerald-600 hover:text-emerald-800 text-xs font-bold hover:underline" href="#">مشاهده جزئیات</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark">۰۵ بهمن ۱۴۰۲</span>
+<span class="text-[10px] text-text-secondary-light">۰۸:۱۵ صبح</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium">بخش جراحی عمومی</td>
+<td class="px-6 py-4 text-sm font-mono text-text-secondary-light" dir="ltr">VIS-87901</td>
+<td class="px-6 py-4 text-sm">دکتر رضایی</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-[10px] font-bold border border-orange-100 dark:border-orange-800">Biopsy</span>
+<span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold border border-blue-100 dark:border-blue-800">Pathology</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<a class="text-emerald-600 hover:text-emerald-800 text-xs font-bold hover:underline" href="#">مشاهده جزئیات</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark">۲۸ دی ۱۴۰۲</span>
+<span class="text-[10px] text-text-secondary-light">۱۴:۴۵ عصر</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium">مرکز تصویربرداری مرکزی</td>
+<td class="px-6 py-4 text-sm font-mono text-text-secondary-light" dir="ltr">VIS-87552</td>
+<td class="px-6 py-4 text-sm">دکتر کریمی</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-100 dark:border-indigo-800">CT Scan</span>
+<span class="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-100 dark:border-indigo-800">PET-CT</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<a class="text-emerald-600 hover:text-emerald-800 text-xs font-bold hover:underline" href="#">مشاهده جزئیات</a>
+</td>
+</tr>
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex flex-col">
+<span class="text-sm font-bold text-text-primary-light dark:text-text-primary-dark">۲۵ دی ۱۴۰۲</span>
+<span class="text-[10px] text-text-secondary-light">۰۹:۰۰ صبح</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm font-medium">کلینیک غربالگری</td>
+<td class="px-6 py-4 text-sm font-mono text-text-secondary-light" dir="ltr">VIS-87200</td>
+<td class="px-6 py-4 text-sm">دکتر سعادتی</td>
+<td class="px-6 py-4">
+<div class="flex flex-wrap gap-1.5">
+<span class="px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-[10px] font-bold border border-indigo-100 dark:border-indigo-800">Mammography</span>
+<span class="px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-bold border border-blue-100 dark:border-blue-800">Lab</span>
+</div>
+</td>
+<td class="px-6 py-4 text-center">
+<a class="text-emerald-600 hover:text-emerald-800 text-xs font-bold hover:underline" href="#">مشاهده جزئیات</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-border-light dark:border-border-dark flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/20">
+<span class="text-xs text-text-secondary-light">نمایش ۴ مورد از کل مراجعات</span>
+<div class="flex items-center gap-2">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-border-light dark:border-border-dark text-text-secondary-light hover:bg-white disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+<span class="text-xs font-bold px-2">۱</span>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-border-light dark:border-border-dark text-text-secondary-light hover:bg-white">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<footer class="mt-auto py-6 text-center text-[10px] text-text-secondary-light border-t border-border-light dark:border-border-dark bg-white dark:bg-card-dark">
+    © ۱۴۰۲ سیستم مدیریت اطلاعات انکولوژی - تمام حقوق محفوظ است.
+</footer>
+
+</body></html>

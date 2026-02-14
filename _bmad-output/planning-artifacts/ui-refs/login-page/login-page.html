@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ورود به سامانه</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#10b981",
+                        "primary-dark": "#059669",
+                        "background-light": "#f3f4f6",
+                    },
+                    fontFamily: {
+                        sans: ["Vazirmatn", "Inter", "sans-serif"],
+                        inter: ["Inter", "sans-serif"],
+                    }
+                }
+            }
+        };
+    </script>
+<style type="text/tailwindcss">
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            @apply bg-background-light text-slate-800;
+        }
+        .font-numbers {
+            font-family: 'Inter', 'Vazirmatn', sans-serif;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+<div class="w-full max-w-md">
+<div class="bg-white rounded-2xl shadow-xl shadow-slate-200/60 border border-slate-100 overflow-hidden">
+<div class="p-8 pb-0 text-center">
+<div class="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-2xl mb-4">
+<span class="material-symbols-outlined text-primary text-4xl">oncology</span>
+</div>
+<h1 class="text-2xl font-bold text-slate-900 mb-2">ورود به سامانه</h1>
+<p class="text-slate-500 text-sm">لطفاً اطلاعات کاربری خود را وارد کنید</p>
+</div>
+<div class="p-8">
+<form action="#" class="space-y-5" method="POST">
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 block mr-1" for="identifier">شماره همراه یا کد ملی</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">person</span>
+<input class="w-full h-12 pr-11 pl-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400" id="identifier" name="identifier" placeholder="مثلا: ۰۹۱۲۳۴۵۶۷۸۹" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-semibold text-slate-700 block mr-1" for="password">کلمه عبور</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+<input class="w-full h-12 pr-11 pl-11 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400" id="password" name="password" placeholder="••••••••" type="password"/>
+<button class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 focus:outline-none" type="button">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<button class="w-full h-12 bg-primary hover:bg-primary-dark text-white font-bold rounded-xl shadow-lg shadow-primary/25 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2" type="submit">
+<span>ورود</span>
+<span class="material-symbols-outlined text-[20px]">login</span>
+</button>
+</form>
+<div class="mt-8 pt-6 border-t border-slate-50 text-center">
+<a class="text-sm text-slate-500 hover:text-primary transition-colors font-medium" href="#">فراموشی کلمه عبور؟</a>
+</div>
+</div>
+</div>
+<p class="mt-8 text-center text-slate-400 text-xs">
+            © سامانه مدیریت پرونده الکترونیک سلامت (EHR)
+        </p>
+</div>
+
+</body></html>
