@@ -38,9 +38,8 @@
   --color-status-scheduled: #6b7280;
 
   /* Fonts */
-  --font-inter: var(--font-inter-base), sans-serif;
-  --font-vazir: var(--font-vazir-base), sans-serif;
-  --font-sans: var(--font-inter-base), var(--font-vazir-base), sans-serif;
+  --font-vazir: var(--font-vazir), sans-serif;
+  --font-sans: var(--font-vazir), sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -53,7 +52,7 @@
 body {
   background: var(--color-background-light);
   color: var(--color-text-primary-light);
-  font-family: var(--font-inter-base), var(--font-vazir-base), sans-serif;
+  font-family: var(--font-vazir), sans-serif;
   /* Ensure direction is RTL for Vazirmatn */
   direction: rtl;
 }

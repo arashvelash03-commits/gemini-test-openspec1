@@ -9,16 +9,9 @@ import { NextAuthProvider } from "@/components/providers/session-provider";
 // NOTE: Ensure the font files are placed in 'src/app/fonts/' as per OFFLINE_GUIDE.md
 // UNCOMMENT THE BLOCKS BELOW AFTER DOWNLOADING THE FONT FILES
 
-const inter = localFont({
-  src: "./fonts/Inter-Variable.woff2",
-  variable: "--font-inter-base",
-  weight: "100 900",
-  display: "swap",
-});
-
 const vazirmatn = localFont({
-  src: "./fonts/Vazirmatn-Variable.woff2", // Assuming variable font
-  variable: "--font-vazir-base",
+  src: "./fonts/Vazirmatn-Variable.woff2",
+  variable: "--font-vazir",
   weight: "100 900",
   display: "swap",
 });
@@ -40,7 +33,7 @@ export default function RootLayout({
         Material Symbols are now loaded via 'material-symbols.css' and local font files.
       */}
       <body
-        className={`${inter.variable} ${vazirmatn.variable} antialiased`}
+        className={`${vazirmatn.variable} antialiased`}
       >
         <NextAuthProvider>
           <Provider>{children}</Provider>

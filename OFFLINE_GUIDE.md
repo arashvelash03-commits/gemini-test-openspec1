@@ -12,7 +12,6 @@ You need to download the following `.woff2` files and place them in the `src/app
 | :--- | :--- | :--- |
 | **Vazirmatn** (Variable) | `Vazirmatn-Variable.woff2` | [Google Fonts](https://fonts.google.com/specimen/Vazirmatn) or [GitHub](https://github.com/rastikerdar/vazirmatn/releases) (Look for `Vazirmatn-Variable.woff2` or `Vazirmatn[wght].woff2` and rename it) |
 | **Material Symbols** | `MaterialSymbolsOutlined.woff2` | [Google Fonts Symbols](https://fonts.google.com/icons) (Select "Material Symbols Outlined", go to "Variable Font" or "Static", download the `.woff2` file). Alternatively, direct link: `https://fonts.gstatic.com/s/materialsymbolsoutlined/v175/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1n-q_4MrImHCIJIZrDCvHOej.woff2` (Note: Links change, best to find a stable source) |
-| **Inter** (Variable) | `Inter-Variable.woff2` | [Google Fonts](https://fonts.google.com/specimen/Inter) or [GitHub](https://github.com/rsms/inter/releases) (Look for `Inter-Variable.woff2` or `Inter[wght].woff2` and rename it). |
 
 ## 2. Directory Structure
 
@@ -22,7 +21,6 @@ Ensure your `src/app/fonts/` directory looks like this:
 src/
   app/
     fonts/
-      Inter-Variable.woff2
       Vazirmatn-Variable.woff2
       MaterialSymbolsOutlined.woff2
       material-symbols.css  <-- (Already created by the dev agent)
@@ -35,10 +33,10 @@ Because GitHub repositories cannot host large binary files by default, the code 
 **After you download the font files:**
 
 1.  Open `src/app/layout.tsx`.
-2.  Ensure the `localFont` configuration for `inter` and `vazirmatn` matches your filenames.
-3.  The `body` tag className should include the font variables:
+2.  Ensure the `localFont` configuration for `vazirmatn` matches your filename.
+3.  The `body` tag className should include the font variable:
     ```tsx
-    <body className={`${inter.variable} ${vazirmatn.variable} antialiased`}>
+    <body className={`${vazirmatn.variable} antialiased`}>
     ```
 
 ## 4. Verify Offline Mode
@@ -52,5 +50,5 @@ Because GitHub repositories cannot host large binary files by default, the code 
 ## Troubleshooting
 
 -   **Squares instead of Icons:** This means `MaterialSymbolsOutlined.woff2` is missing or the path in `material-symbols.css` is incorrect.
--   **Default/Wrong Font:** This means `Vazirmatn-Variable.woff2` or `Inter-Variable.woff2` is missing. The browser fell back to a system font.
+-   **Default/Wrong Font:** This means `Vazirmatn-Variable.woff2` is missing. The browser fell back to a system font.
 -   **Build Errors:** If Next.js complains about missing files, you **must** download the files listed above before the build will succeed.
