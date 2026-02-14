@@ -30,7 +30,20 @@ src/
       material-symbols.css  <-- (Already created by the dev agent)
 ```
 
-## 3. Verify Offline Mode
+## 3. Enable Local Fonts in Code
+
+Because GitHub repositories cannot host large binary files by default, the code in `src/app/layout.tsx` has been commented out to prevent build errors.
+
+**After you download the font files:**
+
+1.  Open `src/app/layout.tsx`.
+2.  Uncomment the `localFont` configuration blocks for `geistSans`, `geistMono`, and `vazirmatn`.
+3.  Update the `body` tag className to include the font variables:
+    ```tsx
+    <body className={`${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable} antialiased`}>
+    ```
+
+## 4. Verify Offline Mode
 
 1.  Disconnect from the internet.
 2.  Run the development server: `npm run dev`

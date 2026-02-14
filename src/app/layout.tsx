@@ -6,7 +6,10 @@ import Provider from "./_trpc/provider";
 import { NextAuthProvider } from "@/components/providers/session-provider";
 
 // Local Font Configuration
-// NOTE: Ensure the font files are placed in 'src/app/fonts/'
+// NOTE: Ensure the font files are placed in 'src/app/fonts/' as per OFFLINE_GUIDE.md
+// UNCOMMENT THE BLOCKS BELOW AFTER DOWNLOADING THE FONT FILES
+
+/*
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff2",
   variable: "--font-geist-sans",
@@ -23,10 +26,11 @@ const geistMono = localFont({
 
 const vazirmatn = localFont({
   src: "./fonts/Vazirmatn-Variable.woff2", // Assuming variable font
-  variable: "--font-vazirmatn",
+  variable: "--font-vazir", // Changed to match globals.css var(--font-vazir)
   weight: "100 900",
   display: "swap",
 });
+*/
 
 export const metadata: Metadata = {
   title: "Gemini Test",
@@ -44,8 +48,12 @@ export default function RootLayout({
         NOTE: The <head> link to Google Fonts has been removed for offline support.
         Material Symbols are now loaded via 'material-symbols.css' and local font files.
       */}
+      {/*
+        NOTE: When local fonts are enabled, update the className below to include:
+        ${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable}
+      */}
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable} antialiased`}
+        className={`antialiased`}
       >
         <NextAuthProvider>
           <Provider>{children}</Provider>
