@@ -149,19 +149,19 @@ So that initial user provisioning is controlled and secure.
 *   **And** they can view a list of all Doctors and Clerks.
 *   **And** they can edit or deactivate Doctor and Clerk accounts.
 
-### Story 1.5: Doctor-Led User Provisioning
+### Story 1.5 (Revised): Doctor-Led Staff Provisioning (Extensible)
 As a Doctor,
-I want to create, view, and manage Clerk and Patient user accounts,
-So that I can delegate tasks and manage my patient roster.
+I want to create and manage accounts for my clinic staff (currently Clerks, with future support for Nurses/Assistants/Doctors),
+So that I can build my team and delegate access appropriate to their roles.
 
 **Acceptance Criteria:**
 
-*   **Given** a user with the role of "Doctor",
-*   **When** they access their user management interface,
-*   **Then** they can create a new user with the role of "Clerk" or "Patient".
-*   **And** a `created_by` field is populated with the Doctor's user ID.
-*   **And** they can view a list of all Clerks and Patients they have created.
-*   **And** they can edit or deactivate the accounts of Clerks and Patients they have created.
+* **Given** a user with the role of "Doctor",
+* **When** they access their user management interface,
+* **Then** they can create a new user and select their role from a list (currently restricted to "Clerk", but architected to support Nurse/Assistant/Doctor in future updates).
+* **And** a `created_by` field is populated with the Doctor's user ID to establish hierarchy.
+* **And** they can view a list of all staff members they have created.
+* **And** they can edit or deactivate the accounts of staff members they have created.
 
 ### Story 1.6: Clerk-Led Patient Provisioning
 As a Clerk,
