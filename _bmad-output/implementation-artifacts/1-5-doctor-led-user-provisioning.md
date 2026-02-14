@@ -1,6 +1,6 @@
 # Story 1.5: Doctor-Led Staff Provisioning
 
-Status: review
+Status: in-progress
 
 ## Story
 
@@ -46,11 +46,21 @@ So that I can build my team and delegate access appropriate to their roles.
   - [x] **Layout Compliance:** Ensure `src/app/(doctor)/doctors/staff/page.tsx` **ONLY** renders the main content (Table/Page Header). DO NOT re-import the Sidebar or Global Header; these are handled by `src/app/(doctor)/layout.tsx`.
   - [x] **Reuse/Adapt Strategy:** Extract the table/form logic from `src/app/admin/users/user-management-view.tsx` into a reusable component (e.g., `UserManagementTable`) if possible, OR copy-paste and adapt to `src/features/staff/components/StaffManagementView.tsx`.
   - [x] **RTL Alignment:** Ensure the table and forms render correctly in the Left Container, respecting the RTL direction of the existing Right Sidebar.
-  - [x] **Modal-First:** Use the existing Dialog/Modal patterns for the "Create Staff" flow to ensure the background context (the list) remains visible.
 - [x] **Integration:**
   - [x] Connect UI to `staff` tRPC router.
   - [x] Verify RBAC (Doctor can only see/edit their own clerks).
   - [x] Verify seamless navigation (no full reload) when entering/exiting this page.
+
+### Review Follow-ups (AI)
+- [ ] [AI-Review][High] Implement Role-Specific tRPC Middleware to centralize authorization logic. [src/server/trpc.ts]
+- [ ] [AI-Review][High] Replace the browser's `window.confirm()` with a UI-consistent confirmation modal for status change actions. [src/features/staff/components/StaffManagementView.tsx]
+- [ ] [AI-Review][Medium] Add a server-side uniqueness check for `phoneNumber` in `createStaff` and `updateStaff` procedures. [src/server/routers/staff.ts]
+- [ ] [AI-Review][Medium] Standardize all API error responses to use `TRPCError` with consistent codes and messages. [src/server/routers/staff.ts]
+- [ ] [AI-Review][Medium] Expand the API test script to provide full coverage for `updateStaff` and `toggleStaffStatus` procedures. [scripts/test-staff-api.ts]
+- [ ] [AI-Review][Low] Add the `htmlFor` attribute to all form labels to improve accessibility. [src/features/staff/components/StaffManagementView.tsx]
+- [ ] [AI-Review][Low] Ensure form inputs are always controlled by initializing `null` or `undefined` values to empty strings. [src/features/staff/components/StaffManagementView.tsx]
+- [ ] [AI-Review][Low] Refactor the `staffRouter` to use the new `doctorProcedure` middleware and remove redundant auth checks. [src/server/routers/staff.ts]
+- [ ] [AI-Review][Medium] Enable editing of all staff data (gender, birthdate, password) in edit mode. [src/server/routers/staff.ts, src/features/staff/components/StaffManagementView.tsx]
 
 ## Dev Notes
 
