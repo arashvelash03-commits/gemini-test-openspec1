@@ -1,11 +1,9 @@
+"use client";
+
 import { trpc } from "@/app/_trpc/client";
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
-  const router = useRouter();
   const { data: profile, isLoading } = trpc.profile.getProfile.useQuery();
-  const utils = trpc.useUtils();
   const reset2FAMutation = trpc.profile.reset2FA.useMutation();
 
 
@@ -41,9 +39,9 @@ export default function ProfilePage() {
                 console.log("User cancelled");
               }
             }}
-            disabled={reset2FAMutation.isLoading}
+            disabled={reset2FAMutation.isPending}
           >
-            {reset2FAMutation.isLoading ? "Resetting..." : "Reset 2FA"}
+            {reset2FAMutation.isPending ? "Resetting..." : "Reset 2FA"}
           </button>
         </div>
       )}
