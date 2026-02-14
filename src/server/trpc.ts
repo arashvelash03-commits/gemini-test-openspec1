@@ -19,3 +19,16 @@ const isAuthed = t.middleware(({ ctx, next }) => {
 });
 
 export const protectedProcedure = t.procedure.use(isAuthed);
+
+const isDoctor = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user || ctx.session.user.role !== "doctor") {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({
+    ctx: {
+      session: ctx.session,
+    },
+  });
+});
+
+export const doctorProcedure = protectedProcedure.use(isDoctor);
