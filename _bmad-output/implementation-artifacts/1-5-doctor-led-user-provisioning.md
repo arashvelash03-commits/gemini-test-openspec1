@@ -5,7 +5,7 @@ Status: ready-for-dev
 ## Story
 
 As a Doctor,
-I want to create and manage accounts for my clinic staff (currently Clerks),
+I want to create and manage accounts for my clinic staff (currently Clerks, with future support for Nurses/Assistants/Doctors),
 So that I can build my team and delegate access appropriate to their roles.
 
 ## Acceptance Criteria
@@ -15,7 +15,7 @@ So that I can build my team and delegate access appropriate to their roles.
 - **Then** the interface loads within the main content area (Left Container) without reloading the Header or Right Sidebar.
 - **And** they can view a list of all staff members they have created (filtered by `created_by`).
 - **And** they can create a new user account via a Modal (preserving the page context).
-- **And** the role is strictly limited to "Clerk".
+- **And** the role is strictly limited to "Clerk" for this version (MVP), but the system is architected to support other staff roles later.
 - **And** the creation form requires:
     - National Code (Unique)
     - Phone Number (Unique)
@@ -31,7 +31,11 @@ So that I can build my team and delegate access appropriate to their roles.
 - [ ] **Backend:** Implement `staffRouter` (tRPC) - *Ref: `src/server/routers/admin.ts`*
   - [ ] Create `createStaff` procedure:
     - [ ] Reuse/Adapt validation logic from `admin.createUser`.
-    - [ ] **CRITICAL:** Enforce `role: 'clerk'` and `created_by: ctx.user.id`.
+    - [ ] **CRITICAL:** Enforce `created_by: ctx.user.id`.
+    - [ ] **Role Logic:** Validate the input `role` against an "Allowed Staff Roles" list.
+        - *Current Allowed List:* `['clerk']`.
+        - *Future:* `['clerk', 'nurse', 'assistant']`.
+        - *Error:* If role is not in the allowed list, throw generic Forbidden error.
     - [ ] Handle unique constraint violations (National Code/Phone).
   - [ ] Create `getMyStaff` procedure:
     - [ ] Logic: `SELECT * FROM users WHERE created_by = ctx.user.id`.
@@ -60,9 +64,13 @@ So that I can build my team and delegate access appropriate to their roles.
 Story 1.4 (Admin Provisioning) is **DONE** and contains 90% of the logic needed here.
 - **Backend:** `src/server/routers/admin.ts` has the Zod schemas and error handling. Copy this pattern but **tighten the scope** (add `created_by` filter).
 - **Frontend:** `src/app/admin/users/user-management-view.tsx` is your blueprint.
-    - Remove the "Role" dropdown (hardcode to Clerk).
+    - Remove the "Role" dropdown (hardcode to Clerk for MVP) OR keep it as a `Select` component with a single option `'Clerk'` to easily add `'Nurse'` later.
     - Ensure the "Created By" column is either hidden or implies "Me".
-    - **Refactoring:** If safe, create a shared `UserCrud` component. If not, duplication is acceptable to speed up delivery, but ensure the "Role" logic is stripped out for Doctors.
+    - **Refactoring:** If safe, create a shared `UserCrud` component. If not, duplication is acceptable to speed up delivery.
+
+### 🔮 Future Support for Other Roles
+- **Backend Extensibility:** Do not simply hardcode `role = 'clerk'` inside the INSERT statement. Instead, accept a `role` argument in the API and validate it against an array of allowed roles (e.g., `const ALLOWED_STAFF_ROLES = ['clerk']`).
+- **Data Model:** The `users` table handles all roles via the `role` Enum. No schema changes are required for future roles, only Enum updates.
 
 ### File Structure Requirements
 - **Page:** `src/app/(doctor)/doctors/staff/page.tsx`
@@ -72,7 +80,7 @@ Story 1.4 (Admin Provisioning) is **DONE** and contains 90% of the logic needed 
 
 ### UI Reference
 - **Mockup:** `_bmad-output\planning-artifacts/ui-refs/1-5-doctor-led-user-provisioning-ui`
-- **Goal:** The UI should look identical to the Admin panel but scoped to the Doctor's context (e.g., no "Role" dropdown).
+- **Goal:** The UI should look identical to the Admin panel but scoped to the Doctor's context.
 
 ## Dev Agent Record
 

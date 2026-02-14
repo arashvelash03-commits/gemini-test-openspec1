@@ -51,7 +51,7 @@ The primary emotional goal for all users is to feel **empowered and intelligentl
 
 ### Inspiring Products Analysis
 
-The UI mockups in `brief_files/ui-refs` are the primary source of inspiration and are directly linked to the user stories in `epics.md`.
+The UI mockups in `_bmad-output\planning-artifacts/ui-refs` are the primary source of inspiration and are directly linked to the user stories in `epics.md`.
 
 *   **Login Page (`login-page.png`, `login-page.html`):** Provides the visual basis for **Story 1.1 (Login)**.
 
@@ -420,7 +420,7 @@ graph TD
 
 ### The Mockup is the Law: A Two-Part System
 
-All UI development **must** strictly adhere to the final UI mockups provided in the `brief_files/ui-refs` directory. These mockups serve as a two-part system for the single source of truth.
+All UI development **must** strictly adhere to the final UI mockups provided in the `_bmad-output\planning-artifacts/ui-refs` directory. These mockups serve as a two-part system for the single source of truth.
 
 1.  **The PNG (`.png`): The Visual Target**
     *   This file is the **visual ground truth**. It dictates the final appearance.
