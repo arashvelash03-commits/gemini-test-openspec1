@@ -83,6 +83,14 @@ export const adminRouter = router({
         throw new Error("Unauthorized");
       }
 
+      const existingUser = await db.query.users.findFirst({
+        where: eq(users.nationalCode, input.nationalCode),
+      });
+
+      if (existingUser && existingUser.id !== input.id) {
+        throw new Error("کد ملی وارد شده تکراری است");
+      }
+
       await db.update(users)
         .set({
           fullName: input.fullName,

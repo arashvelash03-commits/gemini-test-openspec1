@@ -1,6 +1,6 @@
 # Story 1.4: Admin-Led User Provisioning
 
-Status: review
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -33,6 +33,14 @@ so that initial user provisioning is controlled and secure.
   - [x] Add functionality to edit and deactivate users.
 - [x] **Integration:** Connect the Admin Panel to the backend API.
 - [x] **Database:** Update the database schema to include the `created_by` field in the user table (Already existed).
+
+## Code Review
+
+- **Status:** Complete
+- **Findings:**
+    - Admin user provisioning verified.
+    - **Fixed Issue:** Added uniqueness check for `nationalCode` in `updateUser` to prevent duplicates during edit.
+    - Create, Update, Deactivate functions verified.
 
 ## Dev Notes
 

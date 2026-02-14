@@ -35,6 +35,17 @@ export const profileRouter = router({
     .mutation(async ({ input, ctx }) => {
       // Basic sanitization/validation is handled by zod, but we should ensure no sensitive fields are touched
       // This mutation only touches profile fields, which is safe.
+
+      if (input.nationalCode) {
+        const existingUser = await db.query.users.findFirst({
+          where: eq(users.nationalCode, input.nationalCode),
+        });
+
+        if (existingUser && existingUser.id !== ctx.session.user.id) {
+          throw new Error("کد ملی وارد شده تکراری است");
+        }
+      }
+
       await db.update(users)
         .set({
           fullName: input.fullName,
