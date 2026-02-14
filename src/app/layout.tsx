@@ -1,22 +1,31 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Vazirmatn } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
+import "@/app/fonts/material-symbols.css"; // Import Material Symbols CSS
 import Provider from "./_trpc/provider";
 import { NextAuthProvider } from "@/components/providers/session-provider";
 
-const geistSans = Geist({
+// Local Font Configuration
+// NOTE: Ensure the font files are placed in 'src/app/fonts/'
+const geistSans = localFont({
+  src: "./fonts/GeistVF.woff2",
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap", // Ensure fallback text is shown immediately
 });
 
-const geistMono = Geist_Mono({
+const geistMono = localFont({
+  src: "./fonts/GeistMonoVF.woff2",
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
-const vazirmatn = Vazirmatn({
+const vazirmatn = localFont({
+  src: "./fonts/Vazirmatn-Variable.woff2", // Assuming variable font
   variable: "--font-vazirmatn",
-  subsets: ["arabic", "latin"],
+  weight: "100 900",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -31,12 +40,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fa" dir="rtl">
-      <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-          rel="stylesheet"
-        />
-      </head>
+      {/*
+        NOTE: The <head> link to Google Fonts has been removed for offline support.
+        Material Symbols are now loaded via 'material-symbols.css' and local font files.
+      */}
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable} antialiased`}
       >
