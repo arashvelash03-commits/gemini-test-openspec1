@@ -8,8 +8,58 @@ interface Staff {
   fullName: string | null;
   nationalCode: string;
   phoneNumber: string | null;
-  role: "clerk"; // Only clerk for now
+  role: "clerk";
   status: "active" | "inactive" | "error" | null;
+  gender?: "male" | "female" | "other" | "unknown" | null;
+  birthDate?: string | null;
+}
+
+// Simple Modal Component
+function ConfirmationModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  confirmText = "تایید",
+  cancelText = "انصراف",
+  isDestructive = false
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  isDestructive?: boolean;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-slate-900 mb-2">{title}</h3>
+          <p className="text-slate-600 leading-relaxed">{message}</p>
+        </div>
+        <div className="bg-slate-50 px-6 py-4 flex items-center justify-end gap-3 border-t border-slate-100">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-slate-600 font-medium hover:bg-slate-200 rounded-xl transition-colors text-sm"
+          >
+            {cancelText}
+          </button>
+          <button
+            onClick={() => { onConfirm(); onClose(); }}
+            className={`px-4 py-2 text-white font-medium rounded-xl transition-colors text-sm shadow-lg ${isDestructive ? 'bg-red-500 hover:bg-red-600 shadow-red-500/20' : 'bg-primary hover:bg-primary-dark shadow-primary/20'}`}
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function StaffManagementView() {
@@ -17,7 +67,7 @@ export default function StaffManagementView() {
     fullName: "",
     nationalCode: "",
     phoneNumber: "",
-    role: "clerk" as const, // Hardcoded to clerk
+    role: "clerk" as const,
     password: "",
     gender: "male" as "male" | "female" | "other" | "unknown",
     birthDate: "",
@@ -25,6 +75,21 @@ export default function StaffManagementView() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Modal State
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    isDestructive?: boolean;
+    confirmText?: string;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+  });
 
   const utils = trpc.useUtils();
 
@@ -78,6 +143,9 @@ export default function StaffManagementView() {
             fullName: formData.fullName,
             nationalCode: formData.nationalCode,
             phoneNumber: formData.phoneNumber,
+            gender: formData.gender,
+            birthDate: formData.birthDate || undefined,
+            password: formData.password || undefined,
         });
     } else {
         if (!formData.password) {
@@ -88,7 +156,7 @@ export default function StaffManagementView() {
             fullName: formData.fullName,
             nationalCode: formData.nationalCode,
             phoneNumber: formData.phoneNumber,
-            role: "clerk", // Always clerk
+            role: "clerk",
             password: formData.password,
             gender: formData.gender,
             birthDate: formData.birthDate || undefined,
@@ -103,9 +171,9 @@ export default function StaffManagementView() {
           nationalCode: staff.nationalCode,
           phoneNumber: staff.phoneNumber || "",
           role: "clerk",
-          password: "",
-          gender: "male", // Default
-          birthDate: "", // Default
+          password: "", // Always clear password on edit
+          gender: staff.gender || "male",
+          birthDate: staff.birthDate || "",
       });
       setError("");
       setSuccess("");
@@ -124,9 +192,33 @@ export default function StaffManagementView() {
       });
   };
 
+  const confirmToggleStatus = (staff: Staff) => {
+    const isDeactivating = staff.status === 'active' || staff.status === 'error';
+    setModalState({
+      isOpen: true,
+      title: isDeactivating ? "غیرفعال‌سازی پرسنل" : "فعال‌سازی مجدد پرسنل",
+      message: isDeactivating
+        ? `آیا از غیرفعال‌سازی پرسنل ${staff.fullName} اطمینان دارید؟`
+        : `آیا از فعال‌سازی مجدد پرسنل ${staff.fullName} اطمینان دارید؟`,
+      confirmText: isDeactivating ? "غیرفعال‌سازی" : "فعال‌سازی",
+      isDestructive: isDeactivating,
+      onConfirm: () => toggleStatusMutation.mutate({ id: staff.id }),
+    });
+  };
+
   return (
     <div className="flex h-full overflow-hidden bg-slate-50">
-      {/* Staff List Section (Right side in RTL) */}
+      <ConfirmationModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={modalState.onConfirm}
+        title={modalState.title}
+        message={modalState.message}
+        confirmText={modalState.confirmText}
+        isDestructive={modalState.isDestructive}
+      />
+
+      {/* Staff List Section */}
       <section className="flex-1 p-8 overflow-y-auto">
         <header className="mb-8">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">مدیریت پرسنل</h1>
@@ -166,11 +258,7 @@ export default function StaffManagementView() {
                             </button>
                             {staff.status === 'active' || staff.status === 'error' ? (
                                 <button
-                                    onClick={() => {
-                                        if(confirm(`آیا از غیرفعال‌سازی پرسنل ${staff.fullName} اطمینان دارید؟`)) {
-                                            toggleStatusMutation.mutate({ id: staff.id });
-                                        }
-                                    }}
+                                    onClick={() => confirmToggleStatus(staff as any)}
                                     className="flex items-center gap-1 px-3 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors text-xs font-medium border border-red-50"
                                 >
                                     <span className="material-symbols-outlined text-sm">person_off</span>
@@ -178,11 +266,7 @@ export default function StaffManagementView() {
                                 </button>
                             ) : (
                                 <button
-                                    onClick={() => {
-                                        if(confirm(`آیا از فعال‌سازی مجدد پرسنل ${staff.fullName} اطمینان دارید؟`)) {
-                                            toggleStatusMutation.mutate({ id: staff.id });
-                                        }
-                                    }}
+                                    onClick={() => confirmToggleStatus(staff as any)}
                                     className="flex items-center gap-1 px-3 py-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors text-xs font-medium border border-emerald-100"
                                 >
                                     <span className="material-symbols-outlined text-sm">person_check</span>
@@ -196,7 +280,7 @@ export default function StaffManagementView() {
         </div>
       </section>
 
-      {/* Create/Edit User Form Section (Left side in RTL) */}
+      {/* Create/Edit User Form Section */}
       <section className="w-full md:w-[35%] bg-white p-8 border-r border-slate-100 flex flex-col h-full overflow-y-auto">
         <div className="mb-8 flex justify-between items-start">
             <div>
@@ -218,8 +302,8 @@ export default function StaffManagementView() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-slate-700 block mr-1">نقش کاربری</label>
-            <div className="grid grid-cols-1 gap-3">
+            <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="role-select">نقش کاربری</label>
+            <div className="grid grid-cols-1 gap-3" id="role-select">
               <label className="cursor-pointer">
                 <input
                   type="radio"
@@ -283,48 +367,48 @@ export default function StaffManagementView() {
             </div>
           </div>
 
-          {!editingId && (
-            <>
-            <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 block mr-1">جنسیت</label>
-                    <select
-                        value={formData.gender}
-                        onChange={(e) => setFormData({...formData, gender: e.target.value as "male" | "female" | "other" | "unknown"})}
-                        className="w-full h-12 px-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none bg-white"
-                    >
-                        <option value="male">مرد</option>
-                        <option value="female">زن</option>
-                        <option value="other">سایر</option>
-                    </select>
-                </div>
-                <div className="space-y-2">
-                    <label className="text-sm font-semibold text-slate-700 block mr-1">تاریخ تولد</label>
-                    <input
-                        type="date"
-                        value={formData.birthDate}
-                        onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
-                        className="w-full h-12 px-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none font-numbers"
-                    />
-                </div>
-            </div>
+          <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="gender">جنسیت</label>
+                  <select
+                      id="gender"
+                      value={formData.gender}
+                      onChange={(e) => setFormData({...formData, gender: e.target.value as "male" | "female" | "other" | "unknown"})}
+                      className="w-full h-12 px-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none bg-white"
+                  >
+                      <option value="male">مرد</option>
+                      <option value="female">زن</option>
+                      <option value="other">سایر</option>
+                  </select>
+              </div>
+              <div className="space-y-2">
+                  <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="birthdate">تاریخ تولد</label>
+                  <input
+                      id="birthdate"
+                      type="date"
+                      value={formData.birthDate}
+                      onChange={(e) => setFormData({...formData, birthDate: e.target.value})}
+                      className="w-full h-12 px-4 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none font-numbers"
+                  />
+              </div>
+          </div>
 
-            <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="password">کلمه عبور موقت</label>
-                <div className="relative">
-                <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
-                <input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => setFormData({...formData, password: e.target.value})}
-                    className="w-full h-12 pr-11 pl-11 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 outline-none"
-                    placeholder="••••••••"
-                />
-                </div>
-            </div>
-            </>
-          )}
+          <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-700 block mr-1" htmlFor="password">
+                  {editingId ? "تغییر کلمه عبور (اختیاری)" : "کلمه عبور موقت"}
+              </label>
+              <div className="relative">
+              <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+              <input
+                  id="password"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  className="w-full h-12 pr-11 pl-11 rounded-xl border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-numbers placeholder:font-sans placeholder:text-slate-400 outline-none"
+                  placeholder={editingId ? "فقط در صورت نیاز به تغییر وارد کنید" : "••••••••"}
+              />
+              </div>
+          </div>
 
           <div className="pt-4">
             <button
@@ -348,7 +432,7 @@ export default function StaffManagementView() {
             <span className="material-symbols-outlined text-xl mt-0.5">info</span>
             <p className="text-[11px] leading-relaxed">
               {editingId
-                ? "در حالت ویرایش، امکان تغییر نقش و کلمه عبور وجود ندارد. برای تغییر کلمه عبور، پرسنل باید از بخش ورود اقدام کند."
+                ? "برای تغییر کلمه عبور، مقدار جدید را در فیلد مربوطه وارد کنید. در غیر این صورت فیلد را خالی بگذارید."
                 : "کلمه عبور موقت باید پس از اولین ورود توسط پرسنل تغییر یابد. دسترسی‌های پیش‌فرض بر اساس نقش انتخابی تعیین می‌شود."
               }
             </p>

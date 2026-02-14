@@ -1,18 +1,17 @@
-import { router, protectedProcedure } from "../trpc";
+import { router, doctorProcedure } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { TRPCError } from "@trpc/server";
 
 const ALLOWED_STAFF_ROLES = ["clerk"] as const;
 
 export const staffRouter = router({
-  getMyStaff: protectedProcedure
+  getMyStaff: doctorProcedure
     .query(async ({ ctx }) => {
-      if (ctx.session.user.role !== "doctor") {
-        throw new Error("Unauthorized");
-      }
+      // Role check is handled by doctorProcedure middleware
 
       const myStaff = await db.select({
         id: users.id,
@@ -21,6 +20,8 @@ export const staffRouter = router({
         phoneNumber: users.phoneNumber,
         role: users.role,
         status: users.status,
+        gender: users.gender,
+        birthDate: users.birthDate,
       })
       .from(users)
       .where(eq(users.createdBy, ctx.session.user.id))
@@ -29,7 +30,7 @@ export const staffRouter = router({
       return myStaff;
     }),
 
-  createStaff: protectedProcedure
+  createStaff: doctorProcedure
     .input(z.object({
       fullName: z.string().min(3),
       nationalCode: z.string().length(10),
@@ -40,9 +41,7 @@ export const staffRouter = router({
       birthDate: z.string().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      if (ctx.session.user.role !== "doctor") {
-        throw new Error("Unauthorized");
-      }
+      // Role check is handled by doctorProcedure middleware
 
       // Unique check (globally unique national code)
       const existingUser = await db.query.users.findFirst({
@@ -50,7 +49,10 @@ export const staffRouter = router({
       });
 
       if (existingUser) {
-        throw new Error("کاربری با این کد ملی وجود دارد");
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "کاربری با این کد ملی وجود دارد",
+        });
       }
 
       const hashedPassword = await bcrypt.hash(input.password, 10);
@@ -71,17 +73,18 @@ export const staffRouter = router({
       return { success: true };
     }),
 
-  updateStaff: protectedProcedure
+  updateStaff: doctorProcedure
     .input(z.object({
       id: z.string(),
       fullName: z.string().min(3),
       nationalCode: z.string().length(10),
       phoneNumber: z.string().min(10),
+      gender: z.enum(["male", "female", "other", "unknown"]).optional(),
+      birthDate: z.string().optional(),
+      password: z.string().min(6).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
-      if (ctx.session.user.role !== "doctor") {
-        throw new Error("Unauthorized");
-      }
+      // Role check is handled by doctorProcedure middleware
 
       // Ensure ownership
       const existingStaff = await db.query.users.findFirst({
@@ -89,7 +92,10 @@ export const staffRouter = router({
       });
 
       if (!existingStaff) {
-        throw new Error("Staff not found or access denied");
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Staff not found or access denied",
+        });
       }
 
       // Unique check for national code (if changed)
@@ -98,33 +104,47 @@ export const staffRouter = router({
               where: eq(users.nationalCode, input.nationalCode),
           });
           if (duplicate) {
-              throw new Error("کد ملی وارد شده تکراری است");
+              throw new TRPCError({
+                code: "CONFLICT",
+                message: "کد ملی وارد شده تکراری است",
+              });
           }
       }
 
+      const updateData: any = {
+        fullName: input.fullName,
+        nationalCode: input.nationalCode,
+        phoneNumber: input.phoneNumber,
+        gender: input.gender,
+        birthDate: input.birthDate ? input.birthDate : null,
+      };
+
+      if (input.password) {
+        updateData.passwordHash = await bcrypt.hash(input.password, 10);
+      }
+
       await db.update(users)
-        .set({
-          fullName: input.fullName,
-          nationalCode: input.nationalCode,
-          phoneNumber: input.phoneNumber,
-        })
+        .set(updateData)
         .where(eq(users.id, input.id));
 
       return { success: true };
     }),
 
-  toggleStaffStatus: protectedProcedure
+  toggleStaffStatus: doctorProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ input, ctx }) => {
-      if (ctx.session.user.role !== "doctor") {
-        throw new Error("Unauthorized");
-      }
+      // Role check is handled by doctorProcedure middleware
 
       const staff = await db.query.users.findFirst({
           where: and(eq(users.id, input.id), eq(users.createdBy, ctx.session.user.id)),
       });
 
-      if (!staff) throw new Error("Staff not found or access denied");
+      if (!staff) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Staff not found or access denied",
+        });
+      }
 
       const newStatus = staff.status === "active" ? "inactive" : "active";
 
