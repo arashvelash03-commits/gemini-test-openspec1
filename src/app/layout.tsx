@@ -11,14 +11,14 @@ import { NextAuthProvider } from "@/components/providers/session-provider";
 
 const inter = localFont({
   src: "./fonts/Inter-Variable.woff2",
-  variable: "--font-inter",
+  variable: "--font-inter-base",
   weight: "100 900",
   display: "swap",
 });
 
 const vazirmatn = localFont({
   src: "./fonts/Vazirmatn-Variable.woff2", // Assuming variable font
-  variable: "--font-vazir", // Changed to match globals.css var(--font-vazir)
+  variable: "--font-vazir-base",
   weight: "100 900",
   display: "swap",
 });
