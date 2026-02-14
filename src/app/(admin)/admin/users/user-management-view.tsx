@@ -125,7 +125,7 @@ export default function UserManagementView() {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 font-sans">
+    <div className="flex h-screen overflow-hidden bg-slate-50">
       {/* Users List Section (Right side in RTL) */}
       <section className="flex-1 p-8 overflow-y-auto">
         <header className="mb-8">

@@ -38,7 +38,7 @@
   --color-status-scheduled: #6b7280;
 
   /* Fonts */
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-vazir), var(--font-geist-sans), sans-serif;
   --font-mono: var(--font-geist-mono);
   --font-vazir: var(--font-vazir), sans-serif;
 }

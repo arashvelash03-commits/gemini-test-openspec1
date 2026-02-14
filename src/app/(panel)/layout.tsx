@@ -29,7 +29,7 @@ export default function PanelLayout({
   else if (role === "patient") SidebarComponent = PortalSidebar;
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans" dir="rtl">
+    <div className="flex min-h-screen bg-slate-50" dir="rtl">
       <SidebarComponent />
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <Header />
