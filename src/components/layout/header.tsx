@@ -123,6 +123,17 @@ export function Header() {
                                             </Link>
                                         )}
 
+                                        {session?.user?.role === "doctor" && (
+                                            <Link
+                                                href="/doctors/staff"
+                                                className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 text-sm text-text-primary-light dark:text-text-primary-dark transition-colors"
+                                                onClick={() => setIsSettingsOpen(false)}
+                                            >
+                                                <span className="material-symbols-outlined text-lg">group</span>
+                                                <span>مدیریت پرسنل</span>
+                                            </Link>
+                                        )}
+
                                         <div className="border-t border-border-light dark:border-border-dark my-1"></div>
 
                                         <LogoutButton className="w-full justify-start px-3 py-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-sm text-red-600 dark:text-red-400 transition-colors" />
