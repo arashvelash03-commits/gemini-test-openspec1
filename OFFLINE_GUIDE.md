@@ -12,8 +12,6 @@ You need to download the following `.woff2` files and place them in the `src/app
 | :--- | :--- | :--- |
 | **Vazirmatn** (Variable) | `Vazirmatn-Variable.woff2` | [Google Fonts](https://fonts.google.com/specimen/Vazirmatn) or [GitHub](https://github.com/rastikerdar/vazirmatn/releases) (Look for `Vazirmatn-Variable.woff2` or `Vazirmatn[wght].woff2` and rename it) |
 | **Material Symbols** | `MaterialSymbolsOutlined.woff2` | [Google Fonts Symbols](https://fonts.google.com/icons) (Select "Material Symbols Outlined", go to "Variable Font" or "Static", download the `.woff2` file). Alternatively, direct link: `https://fonts.gstatic.com/s/materialsymbolsoutlined/v175/kJF1BvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oDMzByHX9rA6RzaxHMPdY43zj-jCxv3fzvRNU22ZXGJpEpjC_1n-q_4MrImHCIJIZrDCvHOej.woff2` (Note: Links change, best to find a stable source) |
-| **Geist Sans** (Variable) | `GeistVF.woff2` | [Vercel Geist Font](https://vercel.com/font) or check `node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2` if installed. |
-| **Geist Mono** (Variable) | `GeistMonoVF.woff2` | [Vercel Geist Font](https://vercel.com/font) or check `node_modules/geist/dist/fonts/geist-mono/GeistMono-Variable.woff2` if installed. |
 
 ## 2. Directory Structure
 
@@ -23,8 +21,6 @@ Ensure your `src/app/fonts/` directory looks like this:
 src/
   app/
     fonts/
-      GeistVF.woff2
-      GeistMonoVF.woff2
       Vazirmatn-Variable.woff2
       MaterialSymbolsOutlined.woff2
       material-symbols.css  <-- (Already created by the dev agent)
@@ -32,15 +28,15 @@ src/
 
 ## 3. Enable Local Fonts in Code
 
-Because GitHub repositories cannot host large binary files by default, the code in `src/app/layout.tsx` has been commented out to prevent build errors.
+Because GitHub repositories cannot host large binary files by default, the code in `src/app/layout.tsx` relies on these files being present.
 
 **After you download the font files:**
 
 1.  Open `src/app/layout.tsx`.
-2.  Uncomment the `localFont` configuration blocks for `geistSans`, `geistMono`, and `vazirmatn`.
-3.  Update the `body` tag className to include the font variables:
+2.  Ensure the `localFont` configuration for `vazirmatn` matches your filename.
+3.  The `body` tag className should include the font variable:
     ```tsx
-    <body className={`${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable} antialiased`}>
+    <body className={`${vazirmatn.variable} antialiased`}>
     ```
 
 ## 4. Verify Offline Mode

@@ -9,23 +9,9 @@ import { NextAuthProvider } from "@/components/providers/session-provider";
 // NOTE: Ensure the font files are placed in 'src/app/fonts/' as per OFFLINE_GUIDE.md
 // UNCOMMENT THE BLOCKS BELOW AFTER DOWNLOADING THE FONT FILES
 
-const geistSans = localFont({
-  src: "./fonts/GeistVF.woff2",
-  variable: "--font-geist-sans",
-  weight: "100 900",
-  display: "swap", // Ensure fallback text is shown immediately
-});
-
-const geistMono = localFont({
-  src: "./fonts/GeistMonoVF.woff2",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-  display: "swap",
-});
-
 const vazirmatn = localFont({
-  src: "./fonts/Vazirmatn-Variable.woff2", // Assuming variable font
-  variable: "--font-vazir", // Changed to match globals.css var(--font-vazir)
+  src: "./fonts/Vazirmatn-Variable.woff2",
+  variable: "--font-vazir",
   weight: "100 900",
   display: "swap",
 });
@@ -47,7 +33,7 @@ export default function RootLayout({
         Material Symbols are now loaded via 'material-symbols.css' and local font files.
       */}
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${vazirmatn.variable} antialiased`}
+        className={`${vazirmatn.variable} antialiased`}
       >
         <NextAuthProvider>
           <Provider>{children}</Provider>
