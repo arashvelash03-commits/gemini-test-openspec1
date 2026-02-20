@@ -6,8 +6,6 @@ export default function ProfilePage() {
   const { data: profile, isLoading } = trpc.profile.getProfile.useQuery();
   const reset2FAMutation = trpc.profile.reset2FA.useMutation();
 
-
-
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -32,11 +30,8 @@ export default function ProfilePage() {
           <button
             className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => {
-              console.log("Reset 2FA button clicked");
               if (window.confirm("You will be logged out and will have to log in again.")) {
-                console.log("User confirmed");
-              } else {
-                console.log("User cancelled");
+                reset2FAMutation.mutate();
               }
             }}
             disabled={reset2FAMutation.isPending}
