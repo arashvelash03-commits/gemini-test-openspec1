@@ -7,6 +7,7 @@ import { eq, or } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { authenticator } from "otplib";
+import { decrypt } from "@/lib/encryption";
 
 // Allow for some clock drift (30s window by default)
 authenticator.options = { window: 1 };
@@ -89,7 +90,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               throw new TotpRequiredError();
             }
 
-            const isValidTotp = authenticator.check(totpCode, user.totpSecret);
+            const secret = decrypt(user.totpSecret);
+            const isValidTotp = authenticator.check(totpCode, secret);
             if (!isValidTotp) {
                 throw new InvalidTotpError();
             }
