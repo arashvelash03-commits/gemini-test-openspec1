@@ -2,13 +2,31 @@
 
 import { trpc } from "@/app/_trpc/client";
 import { useState } from "react";
+import type { inferRouterOutputs } from "@trpc/server";
+import type { AppRouter } from "@/server/index";
+
+type RouterOutput = inferRouterOutputs<AppRouter>;
+type AuditLogEntry = RouterOutput["admin"]["getAuditLogs"]["logs"][number];
 
 export default function AuditLogsView() {
-  const { data: logs, isLoading, error } = trpc.admin.getAuditLogs.useQuery();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, error } = trpc.admin.getAuditLogs.useQuery({ page, limit: 50 });
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
+
+  const logs = data?.logs || [];
+  const totalPages = data?.totalPages || 1;
+  const totalCount = data?.total || 0;
 
   const toggleDetails = (id: string) => {
     setExpandedLogId(expandedLogId === id ? null : id);
+  };
+
+  const handlePrevPage = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
+  const handleNextPage = () => {
+    if (page < totalPages) setPage(page + 1);
   };
 
   if (isLoading) {
@@ -41,8 +59,30 @@ export default function AuditLogsView() {
             </h1>
             <p className="text-slate-500">مشاهده و بررسی فعالیت‌های کاربران در سیستم</p>
           </div>
-          <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 text-sm text-slate-600 shadow-sm">
-            تعداد رکورد: {logs?.length || 0}
+          <div className="flex items-center gap-4">
+             <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 text-sm text-slate-600 shadow-sm">
+                تعداد کل: {totalCount}
+             </div>
+             {/* Pagination Controls */}
+             <div className="flex items-center gap-2 bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                <button
+                    onClick={handlePrevPage}
+                    disabled={page === 1}
+                    className="p-1 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-white transition-colors"
+                >
+                    <span className="material-symbols-outlined text-lg">chevron_right</span>
+                </button>
+                <span className="text-xs text-slate-600 font-mono w-20 text-center">
+                    {page} / {totalPages}
+                </span>
+                <button
+                    onClick={handleNextPage}
+                    disabled={page === totalPages}
+                    className="p-1 rounded-lg hover:bg-slate-100 disabled:opacity-30 disabled:hover:bg-white transition-colors"
+                >
+                    <span className="material-symbols-outlined text-lg">chevron_left</span>
+                </button>
+             </div>
           </div>
         </div>
 
@@ -61,7 +101,7 @@ export default function AuditLogsView() {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 bg-white">
-                        {logs?.map((log) => (
+                        {logs.map((log) => (
                             <LogRows
                                 key={log.id}
                                 log={log}
@@ -69,7 +109,7 @@ export default function AuditLogsView() {
                                 onToggle={() => toggleDetails(log.id)}
                             />
                         ))}
-                        {logs?.length === 0 && (
+                        {logs.length === 0 && (
                             <tr>
                                 <td colSpan={6} className="px-6 py-12 text-center text-slate-400">
                                     <div className="flex flex-col items-center gap-2">
@@ -88,7 +128,12 @@ export default function AuditLogsView() {
   );
 }
 
-function LogRows({ log, isExpanded, onToggle }: { log: any, isExpanded: boolean, onToggle: () => void }) {
+function LogRows({ log, isExpanded, onToggle }: { log: AuditLogEntry, isExpanded: boolean, onToggle: () => void }) {
+    // Prefer actorDetails if available
+    const actorDetails = log.actorDetails as { name?: string; role?: string } | null;
+    const displayName = actorDetails?.name || log.actorName || "سیستم/ناشناس";
+    const displayRole = actorDetails?.role || log.actorRole || "-";
+
     return (
         <>
             <tr className="hover:bg-slate-50 transition-colors group">
@@ -97,8 +142,8 @@ function LogRows({ log, isExpanded, onToggle }: { log: any, isExpanded: boolean,
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex flex-col">
-                        <span className="text-sm font-semibold text-slate-800">{log.actorName || "سیستم/ناشناس"}</span>
-                        <span className="text-xs text-slate-400">{log.actorRole || "-"}</span>
+                        <span className="text-sm font-semibold text-slate-800">{displayName}</span>
+                        <span className="text-xs text-slate-400">{displayRole}</span>
                     </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

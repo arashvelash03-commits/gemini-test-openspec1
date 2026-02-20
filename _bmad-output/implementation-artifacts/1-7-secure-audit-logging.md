@@ -62,6 +62,13 @@ so that I can track and verify compliance with security regulations.
 - [x] **6. Remove Redundant Timestamp Generation (Minor, Consistency):**
   - [x] In the `logAudit` service (`src/server/services/audit.ts`), remove the `occurredAt: new Date()` field from the `db.insert` call to rely on the database's `DEFAULT now()` mechanism as the single source of truth.
 
+- [x] **7. Implement Missing Audit Points (Login/Logout/Profile) (High, Completeness):**
+  - [x] Implement audit logging for user login in `src/lib/auth.ts`.
+  - [x] Implement audit logging for user logout via new `auth.logout` mutation and `LogoutButton`.
+  - [x] Implement audit logging for self-profile updates (`updateProfile`, `changePassword`, `reset2FA`) in `src/server/routers/profile.ts`.
+  - [x] Implement audit logging for staff management actions in `src/server/routers/staff.ts`.
+  - [x] Define strict `AuditAction` TypeScript union type for type safety.
+
 ## Dev Notes
 
 ### 🏗️ Architecture & Security Constraints (CRITICAL)
@@ -98,9 +105,9 @@ so that I can track and verify compliance with security regulations.
 ### Completion Notes List
 - Implemented `audit_logs` table and migration.
 - Updated `createContext` to capture IP and User Agent.
-- Created `src/server/services/audit.ts` for immutable logging.
-- Integrated audit logging into `adminRouter` and `staffRouter`.
-- Implemented Audit Logs UI in `src/app/(admin)/admin/audit-logs` using `AdminSidebar` and consistent Tailwind design.
+- Created `src/server/services/audit.ts` for immutable logging with strict `AuditAction` typing.
+- Integrated audit logging into `adminRouter`, `staffRouter`, `profileRouter`, and `authRouter`.
+- Implemented Audit Logs UI in `src/app/(admin)/admin/audit-logs` using `AdminSidebar` and consistent Tailwind design with pagination.
 - Added "Reports" link to Admin Sidebar.
 - Provided `scripts/manual-migrate.ts` for manual migration execution.
 - **Review Follow-ups Completed:**
@@ -110,6 +117,8 @@ so that I can track and verify compliance with security regulations.
     - Generated migration `drizzle/0004_add_audit_actor_details_and_index.sql`.
     - Removed redundant `occurredAt` generation.
     - Added type safety to `AuditLogsView` using `inferRouterOutputs`.
+    - Implemented missing audit logs for Login, Logout, Profile Updates, and Staff Management.
+    - Fixed schema syntax error (`$onUpdate` and `$type`).
 
 ### File List
 - src/lib/db/schema.ts
@@ -120,8 +129,13 @@ so that I can track and verify compliance with security regulations.
 - src/server/services/audit.ts
 - src/server/routers/admin.ts
 - src/server/routers/staff.ts
+- src/server/routers/profile.ts
+- src/server/routers/auth.ts
+- src/server/index.ts
+- src/lib/auth.ts
 - src/app/(admin)/admin/audit-logs/page.tsx
 - src/features/audit-logs/components/audit-logs-view.tsx
 - src/components/layout/admin-sidebar.tsx
+- src/components/auth/logout-button.tsx
 - scripts/manual-migrate.ts
 - scripts/check-db-schema.ts

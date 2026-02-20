@@ -2,7 +2,7 @@ import { router, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { users, auditLogs } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { logAudit } from "../services/audit";
 
@@ -148,27 +148,47 @@ export const adminRouter = router({
     }),
 
   getAuditLogs: protectedProcedure
-    .query(async ({ ctx }) => {
+    .input(z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(100).default(50),
+    }).default({ page: 1, limit: 50 }))
+    .query(async ({ ctx, input }) => {
       if (ctx.session.user.role !== "admin") {
         throw new Error("Unauthorized");
       }
 
-      const logs = await db.select({
-        id: auditLogs.id,
-        action: auditLogs.action,
-        resourceType: auditLogs.resourceType,
-        resourceId: auditLogs.resourceId,
-        details: auditLogs.details,
-        ipAddress: auditLogs.ipAddress,
-        occurredAt: auditLogs.occurredAt,
-        actorName: users.fullName,
-        actorRole: users.role,
-      })
-      .from(auditLogs)
-      .leftJoin(users, eq(auditLogs.actorUserId, users.id))
-      .orderBy(desc(auditLogs.occurredAt))
-      .limit(100);
+      const { page, limit } = input;
+      const offset = (page - 1) * limit;
 
-      return logs;
+      const [logs, total] = await Promise.all([
+        db.select({
+          id: auditLogs.id,
+          action: auditLogs.action,
+          resourceType: auditLogs.resourceType,
+          resourceId: auditLogs.resourceId,
+          details: auditLogs.details,
+          actorDetails: auditLogs.actorDetails,
+          ipAddress: auditLogs.ipAddress,
+          occurredAt: auditLogs.occurredAt,
+          actorName: users.fullName, // Fallback from join
+          actorRole: users.role,     // Fallback from join
+        })
+        .from(auditLogs)
+        .leftJoin(users, eq(auditLogs.actorUserId, users.id))
+        .orderBy(desc(auditLogs.occurredAt))
+        .limit(limit)
+        .offset(offset),
+
+        db.select({ count: sql<number>`count(*)` })
+          .from(auditLogs)
+          .then(res => Number(res[0].count))
+      ]);
+
+      return {
+        logs,
+        total,
+        page,
+        totalPages: Math.ceil(total / limit),
+      };
     }),
 });

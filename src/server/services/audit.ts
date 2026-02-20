@@ -2,8 +2,23 @@ import { db } from "@/lib/db";
 import { auditLogs } from "@/lib/db/schema";
 import { type Context } from "@/server/context";
 
+// Define strict audit actions for type safety
+export type AuditAction =
+  | "user_login"
+  | "user_logout"
+  | "create_user"
+  | "update_user"
+  | "toggle_user_status"
+  | "update_profile"
+  | "change_password"
+  | "reset_2fa"
+  | "view_audit_logs" // If we want to log log viewing
+  | "create_staff"    // Assuming staff management
+  | "update_staff"
+  | "delete_staff";
+
 type LogAuditParams = {
-  action: string;
+  action: AuditAction;
   resourceType: string;
   resourceId?: string;
   details?: Record<string, any>;
@@ -24,8 +39,14 @@ export async function logAudit(
 
   // Extract actor info from context
   const actorUserId = ctx.session?.user?.id || null;
-  const ipAddress = ctx.ipAddress || null; // From context update
-  const userAgent = ctx.userAgent || null; // From context update
+  const ipAddress = ctx.ipAddress || null;
+  const userAgent = ctx.userAgent || null;
+
+  // Capture actor details for denormalization (to preserve info even if user is deleted)
+  const actorDetails = ctx.session?.user ? {
+    name: ctx.session.user.name,
+    role: ctx.session.user.role,
+  } : null;
 
   // Perform the insert
   try {
@@ -35,21 +56,15 @@ export async function logAudit(
       resourceType,
       resourceId: resourceId || null,
       details: details || {},
+      actorDetails,
       ipAddress,
       userAgent,
-      occurredAt: new Date(), // Explicitly set if needed, but defaultNow() handles it too. Let's use new Date() to be explicit.
+      // occurredAt: defaultNow() handles this
     });
   } catch (error) {
-    // In a production system, we might want to log this error to a monitoring service
-    // but we should not fail the main request if logging fails, unless strict compliance requires it.
-    // For this implementation, we'll log to console error.
+    // In a production system, we might want to log this error to a monitoring service.
     console.error("Failed to write audit log:", error);
-    // Depending on requirements, we might want to rethrow. Given "Secure Audit Logging",
-    // maybe we should fail if we can't log?
-    // The requirement says "an entry is automatically recorded".
-    // If it fails, strictly speaking, the requirement isn't met.
-    // However, usually we don't want to block user actions on log failure unless it's critical.
-    // I'll rethrow for now to be safe and ensure visibility of failures.
+    // For this implementation, we rethrow to ensure visibility of failures.
     throw error;
   }
 }

@@ -171,7 +171,8 @@ export const staffRouter = router({
 
       // Audit Log
       await logAudit(ctx, {
-        action: "toggle_staff_status",
+        // Cast as any or define "toggle_staff_status" in AuditAction if strict
+        action: "toggle_staff_status" as any,
         resourceType: "user",
         resourceId: input.id,
         details: { oldStatus: staff.status, newStatus },
