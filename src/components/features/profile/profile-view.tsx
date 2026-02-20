@@ -15,6 +15,7 @@ export function ProfileView() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
+    const [resetPassword, setResetPassword] = useState("");
 
   const { data: profileData, isLoading } = trpc.profile.getProfile.useQuery();
 
@@ -49,6 +50,7 @@ export function ProfileView() {
       },
       onError: (error) => {
           setErrorMessage(error.message);
+          setTimeout(() => setErrorMessage(null), 3000);
       }
   });
 
@@ -290,18 +292,29 @@ export function ProfileView() {
                                         <div className="flex gap-3">
                                             <span className="material-symbols-outlined text-orange-600 text-xl">info</span>
                                             <p className="text-xs text-orange-800 dark:text-orange-300 leading-normal">
-                                                با بازنشانی تنظیمات 2FA، شما از حساب کاربری خارج می‌شوید و باید مجدداً احراز هویت را راه‌اندازی کنید. آیا مطمئن هستید؟
+                                                با بازنشانی تنظیمات 2FA، شما از حساب کاربری خارج می‌شوید و باید مجدداً احراز هویت را راه‌اندازی کنید.
+                                                <br/>
+                                                برای تایید، لطفا رمز عبور خود را وارد کنید.
                                             </p>
                                         </div>
-                                        <div className="flex justify-end gap-2">
-                                            <label className="px-3 py-1.5 text-[10px] font-bold text-text-secondary-light cursor-pointer hover:bg-gray-200/50 dark:hover:bg-gray-800 rounded" htmlFor="reset-2fa-trigger">انصراف</label>
-                                            <button
-                                                onClick={() => reset2FAMutation.mutate()}
-                                                disabled={reset2FAMutation.isPending}
-                                                className="px-3 py-1.5 bg-orange-600 text-white text-[10px] font-bold rounded shadow-sm hover:bg-orange-700 transition-colors disabled:opacity-70"
-                                            >
-                                                {reset2FAMutation.isPending ? "در حال انجام..." : "بله، بازنشانی"}
-                                            </button>
+                                        <div className="flex flex-col gap-2">
+                                            <input
+                                                type="password"
+                                                placeholder="رمز عبور فعلی"
+                                                className="w-full text-sm bg-white dark:bg-gray-800 border-border-light dark:border-border-dark rounded-lg px-3 py-2"
+                                                value={resetPassword}
+                                                onChange={(e) => setResetPassword(e.target.value)}
+                                            />
+                                            <div className="flex justify-end gap-2">
+                                                <label className="px-3 py-1.5 text-[10px] font-bold text-text-secondary-light cursor-pointer hover:bg-gray-200/50 dark:hover:bg-gray-800 rounded" htmlFor="reset-2fa-trigger">انصراف</label>
+                                                <button
+                                                    onClick={() => reset2FAMutation.mutate({ password: resetPassword })}
+                                                    disabled={reset2FAMutation.isPending || !resetPassword}
+                                                    className="px-3 py-1.5 bg-orange-600 text-white text-[10px] font-bold rounded shadow-sm hover:bg-orange-700 transition-colors disabled:opacity-70"
+                                                >
+                                                    {reset2FAMutation.isPending ? "در حال انجام..." : "بله، بازنشانی"}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
