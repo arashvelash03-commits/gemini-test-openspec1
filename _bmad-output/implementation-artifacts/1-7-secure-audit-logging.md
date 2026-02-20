@@ -36,6 +36,28 @@ so that I can track and verify compliance with security regulations.
   - [x] Create the Audit Log viewing page for administrators.
   - [x] Wrap the page layout with the application's default header and sidebar components.
 
+### Review Follow-ups (AI)
+- [ ] **1. Implement Pagination for Audit Logs (Major, Performance):**
+  - [ ] Modify the `getAuditLogs` tRPC procedure in `src/server/routers/admin.ts` to accept pagination input (e.g., `cursor` or `page`/`limit`).
+  - [ ] Update the `AuditLogsView` component in `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx` to include UI elements for pagination (e.g., "Load More" button or page numbers) and fetch data accordingly.
+
+- [ ] **2. Add Database Index for `actor_user_id` (Major, Performance):**
+  - [ ] Create a new Drizzle migration file.
+  - [ ] Add the SQL command to create an index on the `actor_user_id` column in the `audit_logs` table to improve query performance.
+
+- [ ] **3. Preserve Actor Information on User Deletion (Medium, Data Integrity):**
+  - [ ] Modify the `audit_logs` table schema in `src/lib/db/schema.ts` to include a new `actor_details` JSONB column.
+  - [ ] Update the `logAudit` service in `src/server/services/audit.ts` to capture the actor's name and role from the context and store it in the new `actor_details` column, ensuring the log remains complete even if the user is deleted.
+  - [ ] Update the `getAuditLogs` query to use this denormalized data instead of joining with the `users` table.
+
+- [ ] **4. Use Specific Type for `log` Prop (Minor, Code Quality):**
+  - [ ] In `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx`, define a TypeScript type for the log entry using tRPC's `inferRouterOutputs`.
+  - [ ] Apply this inferred type to the `log` prop in the `LogRows` component instead of `any`.
+
+- [ ] **5. Remove Redundant Timestamp Generation (Minor, Consistency):**
+  - [ ] In the `logAudit` service (`src/server/services/audit.ts`), remove the `occurredAt: new Date()` field from the `db.insert` call to rely on the database's `DEFAULT now()` mechanism as the single source of truth.
+
+
 ## Dev Notes
 
 ### 🏗️ Architecture & Security Constraints (CRITICAL)
@@ -92,29 +114,3 @@ so that I can track and verify compliance with security regulations.
 - scripts/test-audit-logs.ts
 - scripts/manual-migrate.ts
 - scripts/check-db-schema.ts
-
-## Code Review Action Items
-
-- [ ] **1. Implement Pagination for Audit Logs (Major, Performance):**
-  - [ ] Modify the `getAuditLogs` tRPC procedure in `src/server/routers/admin.ts` to accept pagination input (e.g., `cursor` or `page`/`limit`).
-  - [ ] Update the `AuditLogsView` component in `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx` to include UI elements for pagination (e.g., "Load More" button or page numbers) and fetch data accordingly.
-
-- [ ] **2. Add Database Index for `actor_user_id` (Major, Performance):**
-  - [ ] Create a new Drizzle migration file.
-  - [ ] Add the SQL command to create an index on the `actor_user_id` column in the `audit_logs` table to improve query performance.
-
-- [ ] **3. Preserve Actor Information on User Deletion (Medium, Data Integrity):**
-  - [ ] Modify the `audit_logs` table schema in `src/lib/db/schema.ts` to include a new `actor_details` JSONB column.
-  - [ ] Update the `logAudit` service in `src/server/services/audit.ts` to capture the actor's name and role from the context and store it in the new `actor_details` column, ensuring the log remains complete even if the user is deleted.
-  - [ ] Update the `getAuditLogs` query to use this denormalized data instead of joining with the `users` table.
-
-- [ ] **4. Use Specific Type for `log` Prop (Minor, Code Quality):**
-  - [ ] In `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx`, define a TypeScript type for the log entry using tRPC's `inferRouterOutputs`.
-  - [ ] Apply this inferred type to the `log` prop in the `LogRows` component instead of `any`.
-
-- [ ] **5. Remove Redundant Timestamp Generation (Minor, Consistency):**
-  - [ ] In the `logAudit` service (`src/server/services/audit.ts`), remove the `occurredAt: new Date()` field from the `db.insert` call to rely on the database's `DEFAULT now()` mechanism as the single source of truth.
-
-- [ ] **6. Standardize Client-Side Date Formatting (Minor, UX):**
-  - [ ] Add a date-formatting library (e.g., `date-fns` or `dayjs`) to the project.
-  - [ ] In `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx`, replace the use of `new Date().toLocaleString('fa-IR')` with the chosen library to ensure consistent date formatting for all users.
