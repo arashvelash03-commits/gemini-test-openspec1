@@ -4,9 +4,15 @@ import { trpc } from "@/app/_trpc/client";
 
 export default function ProfilePage() {
   const { data: profile, isLoading } = trpc.profile.getProfile.useQuery();
-  const reset2FAMutation = trpc.profile.reset2FA.useMutation();
-
-
+  const reset2FAMutation = trpc.profile.reset2FA.useMutation({
+    onSuccess: () => {
+      alert("2FA با موفقیت بازنشانی شد. شما از سیستم خارج می‌شوید.");
+      window.location.href = "/api/auth/signout";
+    },
+    onError: (err) => {
+      alert("خطا: " + err.message);
+    }
+  });
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -32,16 +38,16 @@ export default function ProfilePage() {
           <button
             className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             onClick={() => {
-              console.log("Reset 2FA button clicked");
-              if (window.confirm("You will be logged out and will have to log in again.")) {
-                console.log("User confirmed");
-              } else {
-                console.log("User cancelled");
+              if (window.confirm("با بازنشانی 2FA از سیستم خارج می‌شوید. ادامه می‌دهید؟")) {
+                const password = window.prompt("لطفا رمز عبور خود را برای تایید وارد کنید:");
+                if (password) {
+                  reset2FAMutation.mutate({ password });
+                }
               }
             }}
             disabled={reset2FAMutation.isPending}
           >
-            {reset2FAMutation.isPending ? "Resetting..." : "Reset 2FA"}
+            {reset2FAMutation.isPending ? "در حال بازنشانی..." : "بازنشانی 2FA"}
           </button>
         </div>
       )}

@@ -87,15 +87,26 @@ export const profileRouter = router({
     }),
 
   reset2FA: protectedProcedure
-    .mutation(async ({ ctx }) => {
-        // Security: Resetting 2FA allows a user to bypass it.
-        // We might want to require password confirmation here in a stricter app,
-        // but the current spec implies a simple reset button inside the authenticated session.
-        // The user is already authenticated to access this procedure.
+    .input(z.object({
+      password: z.string().min(1, "رمز عبور الزامی است"),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, ctx.session.user.id),
+      });
 
-        await db.update(users)
-            .set({ totpEnabled: false, totpSecret: null })
-            .where(eq(users.id, ctx.session.user.id));
-        return { success: true };
+      if (!user || !user.passwordHash) {
+        throw new Error("User not found");
+      }
+
+      const isMatch = await bcrypt.compare(input.password, user.passwordHash);
+      if (!isMatch) {
+        throw new Error("رمز عبور اشتباه است");
+      }
+
+      await db.update(users)
+        .set({ totpEnabled: false, totpSecret: null })
+        .where(eq(users.id, ctx.session.user.id));
+      return { success: true };
     }),
 });
