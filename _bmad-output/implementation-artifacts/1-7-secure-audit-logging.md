@@ -23,6 +23,7 @@ so that I can track and verify compliance with security regulations.
   - [x] Add the `audit_logs` table to `src/lib/db/schema.ts` strictly matching the schema defined in the architecture.
   - [x] Ensure the schema uses `id` (UUID PK), `actor_user_id` (UUID FK), `action` (TEXT), `resource_type` (TEXT), `resource_id` (UUID), `details` (JSONB), `ip_address` (TEXT), `user_agent` (TEXT), and `occurred_at` (TIMESTAMPTZ DEFAULT NOW()).
   - [x] Generate and apply the Drizzle database migration.
+    - *Note:* Migration file `drizzle/0003_mature_doctor_spectrum.sql` generated. Manual execution required in environment with running DB.
 - [x] **Context & Metadata Capture**
   - [x] Update the tRPC context in `src/server/context.ts` to extract and expose the `ip_address` (e.g., via `x-forwarded-for` headers) and `user_agent` from the incoming Next.js request.
 - [x] **Audit Logging Service/Middleware**
@@ -66,7 +67,7 @@ so that I can track and verify compliance with security regulations.
 - `scripts/test-audit-logs.ts` verified structure and types.
 - `npm run build` verified compilation and integration.
 - Database migration file generated: `drizzle/0003_mature_doctor_spectrum.sql`.
-- **Note:** Database migration could not be applied due to environment restrictions (no running DB/docker). Verification relied on build and static analysis.
+- **Note:** Database migration could not be applied due to environment restrictions (no running DB/docker). Verification relied on build and static analysis. User must apply migration manually.
 
 ### Completion Notes List
 - Implemented `audit_logs` table and migration.
@@ -75,6 +76,7 @@ so that I can track and verify compliance with security regulations.
 - Integrated audit logging into `adminRouter` and `staffRouter`.
 - Implemented Audit Logs UI in `src/app/(admin)/admin/audit-logs` using `AdminSidebar` and consistent Tailwind design.
 - Added "Reports" link to Admin Sidebar.
+- Provided `scripts/manual-migrate.ts` for manual migration execution.
 
 ### File List
 - src/lib/db/schema.ts
@@ -88,3 +90,5 @@ so that I can track and verify compliance with security regulations.
 - src/app/(admin)/admin/audit-logs/audit-logs-view.tsx
 - src/components/layout/admin-sidebar.tsx
 - scripts/test-audit-logs.ts
+- scripts/manual-migrate.ts
+- scripts/check-db-schema.ts
