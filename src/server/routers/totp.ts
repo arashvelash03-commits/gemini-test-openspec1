@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { authenticator } from "otplib";
 import QRCode from "qrcode";
 import { TRPCError } from "@trpc/server";
+import { encrypt, decrypt } from "@/lib/encryption";
 
 export const totpRouter = router({
   generateTotpSecret: protectedProcedure
@@ -25,15 +26,16 @@ export const totpRouter = router({
           return { secret: null, qrCodeUrl: null, alreadyEnabled: true };
       }
 
-      let secret = user.totpSecret;
+      let secret = user.totpSecret ? decrypt(user.totpSecret) : null;
 
       // If no secret exists, or if we want to ensure a secret exists for setup
       if (!secret) {
           secret = authenticator.generateSecret();
+          const encryptedSecret = encrypt(secret);
           // Save secret to DB (enabled=false until verified)
           await db
             .update(users)
-            .set({ totpSecret: secret, totpEnabled: false })
+            .set({ totpSecret: encryptedSecret, totpEnabled: false })
             .where(eq(users.id, user.id));
       }
 
@@ -64,7 +66,8 @@ export const totpRouter = router({
         });
       }
 
-      const isValid = authenticator.check(token, user.totpSecret);
+      const secret = decrypt(user.totpSecret);
+      const isValid = authenticator.check(token, secret);
 
       if (!isValid) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid token" });
