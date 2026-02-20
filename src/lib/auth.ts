@@ -74,7 +74,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // To prevent user enumeration attacks, we'll use a dummy hash if the user is not found.
           // This ensures that the bcrypt.compare function takes a similar amount of time for both
           // existing and non-existing users.
-          const passwordHash = user?.passwordHash ?? "$2a$10$GN3s.dG.E2N5b2w/1s5k.uN0J0s5g5g5g5g5g5g5g5g5g5g5g5g5g";
+          const passwordHash = user?.passwordHash ?? "$2b$12$2BksK.Bttfx0pRtFAsOsweFwa/SN8lirzYdNdrDXWRszB5dl/4Fg6";
           const passwordMatch = await bcrypt.compare(password, passwordHash);
 
           if (!user || !passwordMatch) {
