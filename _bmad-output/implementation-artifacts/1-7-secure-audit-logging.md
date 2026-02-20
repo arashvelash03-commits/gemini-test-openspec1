@@ -37,26 +37,30 @@ so that I can track and verify compliance with security regulations.
   - [x] Wrap the page layout with the application's default header and sidebar components.
 
 ### Review Follow-ups (AI)
-- [ ] **1. Implement Pagination for Audit Logs (Major, Performance):**
-  - [ ] Modify the `getAuditLogs` tRPC procedure in `src/server/routers/admin.ts` to accept pagination input (e.g., `cursor` or `page`/`limit`).
-  - [ ] Update the `AuditLogsView` component in `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx` to include UI elements for pagination (e.g., "Load More" button or page numbers) and fetch data accordingly.
+- [x] **1. Fix Architectural Violation: Feature-Based Slicing (Critical, Architecture):**
+  - [x] Move the `AuditLogsView` component out of the routing tree from `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx` into its correct feature boundary: `src/features/audit-logs/components/AuditLogsView.tsx`.
+  - [x] Refactor `src/app/(admin)/admin/audit-logs/page.tsx` so it strictly acts as a route definition, importing and rendering the `AuditLogsView` component from the `src/features/` directory.
+  - [x] Ensure no smart business logic or reusable UI components are left inside the `src/app/` directory tree, strictly adhering to the project structure boundaries.
 
-- [ ] **2. Add Database Index for `actor_user_id` (Major, Performance):**
-  - [ ] Create a new Drizzle migration file.
-  - [ ] Add the SQL command to create an index on the `actor_user_id` column in the `audit_logs` table to improve query performance.
+- [x] **2. Implement Pagination for Audit Logs (Major, Performance):**
+  - [x] Modify the `getAuditLogs` tRPC procedure in `src/server/routers/admin.ts` to accept pagination input (e.g., `cursor` or `page`/`limit`).
+  - [x] Update the `AuditLogsView` component in `src/features/audit-logs/components/audit-logs-view.tsx` to include UI elements for pagination (e.g., "Load More" button or page numbers) and fetch data accordingly.
 
-- [ ] **3. Preserve Actor Information on User Deletion (Medium, Data Integrity):**
-  - [ ] Modify the `audit_logs` table schema in `src/lib/db/schema.ts` to include a new `actor_details` JSONB column.
-  - [ ] Update the `logAudit` service in `src/server/services/audit.ts` to capture the actor's name and role from the context and store it in the new `actor_details` column, ensuring the log remains complete even if the user is deleted.
-  - [ ] Update the `getAuditLogs` query to use this denormalized data instead of joining with the `users` table.
+- [x] **3. Add Database Index for `actor_user_id` (Major, Performance):**
+  - [x] Create a new Drizzle migration file.
+  - [x] Add the SQL command to create an index on the `actor_user_id` column in the `audit_logs` table to improve query performance.
 
-- [ ] **4. Use Specific Type for `log` Prop (Minor, Code Quality):**
-  - [ ] In `src/app/(admin)/admin/audit-logs/audit-logs-view.tsx`, define a TypeScript type for the log entry using tRPC's `inferRouterOutputs`.
-  - [ ] Apply this inferred type to the `log` prop in the `LogRows` component instead of `any`.
+- [x] **4. Preserve Actor Information on User Deletion (Medium, Data Integrity):**
+  - [x] Modify the `audit_logs` table schema in `src/lib/db/schema.ts` to include a new `actor_details` JSONB column (Note: separate from existing `details` column).
+  - [x] Update the `logAudit` service in `src/server/services/audit.ts` to capture the actor's name and role from the context and store it in the new `actor_details` column, ensuring the log remains complete even if the user is deleted.
+  - [x] Update the `getAuditLogs` query to use this denormalized data instead of joining with the `users` table.
 
-- [ ] **5. Remove Redundant Timestamp Generation (Minor, Consistency):**
-  - [ ] In the `logAudit` service (`src/server/services/audit.ts`), remove the `occurredAt: new Date()` field from the `db.insert` call to rely on the database's `DEFAULT now()` mechanism as the single source of truth.
+- [x] **5. Use Specific Type for `log` Prop (Minor, Code Quality):**
+  - [x] In `src/features/audit-logs/components/audit-logs-view.tsx`, define a TypeScript type for the log entry using tRPC's `inferRouterOutputs`.
+  - [x] Apply this inferred type to the `log` prop in the `LogRows` component instead of `any`.
 
+- [x] **6. Remove Redundant Timestamp Generation (Minor, Consistency):**
+  - [x] In the `logAudit` service (`src/server/services/audit.ts`), remove the `occurredAt: new Date()` field from the `db.insert` call to rely on the database's `DEFAULT now()` mechanism as the single source of truth.
 
 ## Dev Notes
 
@@ -99,18 +103,25 @@ so that I can track and verify compliance with security regulations.
 - Implemented Audit Logs UI in `src/app/(admin)/admin/audit-logs` using `AdminSidebar` and consistent Tailwind design.
 - Added "Reports" link to Admin Sidebar.
 - Provided `scripts/manual-migrate.ts` for manual migration execution.
+- **Review Follow-ups Completed:**
+    - Refactored `AuditLogsView` to `src/features/audit-logs/components/`.
+    - Added pagination and total count to audit logs query and UI.
+    - Added `actor_details` column (denormalized user info) and index on `actor_user_id` to schema.
+    - Generated migration `drizzle/0004_add_audit_actor_details_and_index.sql`.
+    - Removed redundant `occurredAt` generation.
+    - Added type safety to `AuditLogsView` using `inferRouterOutputs`.
 
 ### File List
 - src/lib/db/schema.ts
 - drizzle.config.ts
 - drizzle/0003_mature_doctor_spectrum.sql
+- drizzle/0004_add_audit_actor_details_and_index.sql
 - src/server/context.ts
 - src/server/services/audit.ts
 - src/server/routers/admin.ts
 - src/server/routers/staff.ts
 - src/app/(admin)/admin/audit-logs/page.tsx
-- src/app/(admin)/admin/audit-logs/audit-logs-view.tsx
+- src/features/audit-logs/components/audit-logs-view.tsx
 - src/components/layout/admin-sidebar.tsx
-- scripts/test-audit-logs.ts
 - scripts/manual-migrate.ts
 - scripts/check-db-schema.ts
