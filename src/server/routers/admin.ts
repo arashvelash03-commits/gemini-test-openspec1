@@ -45,6 +45,7 @@ export const adminRouter = router({
 
       const existingUser = await db.query.users.findFirst({
         where: eq(users.nationalCode, input.nationalCode),
+        columns: { id: true },
       });
 
       if (existingUser) {
@@ -85,6 +86,7 @@ export const adminRouter = router({
 
       const existingUser = await db.query.users.findFirst({
         where: eq(users.nationalCode, input.nationalCode),
+        columns: { id: true },
       });
 
       if (existingUser && existingUser.id !== input.id) {
@@ -111,6 +113,7 @@ export const adminRouter = router({
 
       const user = await db.query.users.findFirst({
           where: eq(users.id, input.id),
+          columns: { status: true },
       });
 
       if (!user) throw new Error("User not found");
