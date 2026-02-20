@@ -5,6 +5,7 @@ import { users } from "@/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
+import { PASSWORD_SALT_ROUNDS } from "@/lib/security";
 
 const ALLOWED_STAFF_ROLES = ["clerk"] as const;
 
@@ -55,7 +56,7 @@ export const staffRouter = router({
         });
       }
 
-      const hashedPassword = await bcrypt.hash(input.password, 10);
+      const hashedPassword = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
 
       await db.insert(users).values({
         fullName: input.fullName,
@@ -120,7 +121,7 @@ export const staffRouter = router({
       };
 
       if (input.password) {
-        updateData.passwordHash = await bcrypt.hash(input.password, 10);
+        updateData.passwordHash = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
       }
 
       await db.update(users)

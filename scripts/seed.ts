@@ -2,12 +2,13 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
+import { PASSWORD_SALT_ROUNDS } from "@/lib/security";
 
 async function seed() {
   console.log("Seeding database...");
 
   const password = "password123";
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(password, PASSWORD_SALT_ROUNDS);
   const secret = "KVKFKRCPNZQUYMLXOVYDSQKJKZDTSRLD"; // Known secret for testing
 
   const usersData = [

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { PASSWORD_SALT_ROUNDS } from "@/lib/security";
 
 export const profileRouter = router({
   getProfile: protectedProcedure
@@ -77,7 +78,7 @@ export const profileRouter = router({
         throw new Error("کلمه عبور فعلی اشتباه است");
       }
 
-      const hashedPassword = await bcrypt.hash(input.newPassword, 10);
+      const hashedPassword = await bcrypt.hash(input.newPassword, PASSWORD_SALT_ROUNDS);
 
       await db.update(users)
         .set({ passwordHash: hashedPassword })

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { PASSWORD_SALT_ROUNDS } from "@/lib/security";
 
 export const adminRouter = router({
   getUsers: protectedProcedure
@@ -51,7 +52,7 @@ export const adminRouter = router({
         throw new Error("کاربری با این کد ملی وجود دارد");
       }
 
-      const hashedPassword = await bcrypt.hash(input.password, 10);
+      const hashedPassword = await bcrypt.hash(input.password, PASSWORD_SALT_ROUNDS);
 
       await db.insert(users).values({
         fullName: input.fullName,
