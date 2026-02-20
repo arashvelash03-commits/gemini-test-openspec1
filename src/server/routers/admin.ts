@@ -1,9 +1,10 @@
 import { router, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { users, auditLogs } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
+import { logAudit } from "../services/audit";
 
 export const adminRouter = router({
   getUsers: protectedProcedure
@@ -53,7 +54,7 @@ export const adminRouter = router({
 
       const hashedPassword = await bcrypt.hash(input.password, 10);
 
-      await db.insert(users).values({
+      const [newUser] = await db.insert(users).values({
         fullName: input.fullName,
         nationalCode: input.nationalCode,
         phoneNumber: input.phoneNumber,
@@ -63,9 +64,15 @@ export const adminRouter = router({
         status: "active",
         createdBy: ctx.session.user.id, // Fill createdBy
         gender: input.gender,
-        birthDate: input.birthDate // Assuming string date is compatible or needs "new Date()"
-          ? input.birthDate // drizzle-orm date mode="date" expects string YYYY-MM-DD usually, but let's check
-          : null,
+        birthDate: input.birthDate ? input.birthDate : null,
+      }).returning({ id: users.id });
+
+      // Audit Log
+      await logAudit(ctx, {
+        action: "create_user",
+        resourceType: "user",
+        resourceId: newUser.id,
+        details: { role: input.role, nationalCode: input.nationalCode },
       });
 
       return { success: true };
@@ -99,6 +106,14 @@ export const adminRouter = router({
         })
         .where(eq(users.id, input.id));
 
+      // Audit Log
+      await logAudit(ctx, {
+        action: "update_user",
+        resourceType: "user",
+        resourceId: input.id,
+        details: { changedFields: ["fullName", "nationalCode", "phoneNumber"] },
+      });
+
       return { success: true };
     }),
 
@@ -121,6 +136,39 @@ export const adminRouter = router({
         .set({ status: newStatus })
         .where(eq(users.id, input.id));
 
+      // Audit Log
+      await logAudit(ctx, {
+        action: "toggle_user_status",
+        resourceType: "user",
+        resourceId: input.id,
+        details: { oldStatus: user.status, newStatus },
+      });
+
       return { success: true };
+    }),
+
+  getAuditLogs: protectedProcedure
+    .query(async ({ ctx }) => {
+      if (ctx.session.user.role !== "admin") {
+        throw new Error("Unauthorized");
+      }
+
+      const logs = await db.select({
+        id: auditLogs.id,
+        action: auditLogs.action,
+        resourceType: auditLogs.resourceType,
+        resourceId: auditLogs.resourceId,
+        details: auditLogs.details,
+        ipAddress: auditLogs.ipAddress,
+        occurredAt: auditLogs.occurredAt,
+        actorName: users.fullName,
+        actorRole: users.role,
+      })
+      .from(auditLogs)
+      .leftJoin(users, eq(auditLogs.actorUserId, users.id))
+      .orderBy(desc(auditLogs.occurredAt))
+      .limit(100);
+
+      return logs;
     }),
 });

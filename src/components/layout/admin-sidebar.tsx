@@ -31,6 +31,13 @@ export function AdminSidebar() {
             <span>کاربران</span>
         </Link>
         <Link
+            href="/admin/audit-logs"
+            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/admin/audit-logs') ? "bg-primary-light text-primary-dark font-bold" : "text-text-secondary-light hover:bg-gray-50 dark:text-text-secondary-dark dark:hover:bg-gray-800"}`}
+        >
+            <span className="material-symbols-outlined">security</span>
+            <span>گزارش‌ها</span>
+        </Link>
+        <Link
             href="/admin/profile"
             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${isActive('/admin/profile') ? "bg-primary-light text-primary-dark font-bold" : "text-text-secondary-light hover:bg-gray-50 dark:text-text-secondary-dark dark:hover:bg-gray-800"}`}
         >

@@ -5,6 +5,7 @@ import { users } from "@/lib/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
+import { logAudit } from "../services/audit";
 
 const ALLOWED_STAFF_ROLES = ["clerk"] as const;
 
@@ -57,7 +58,7 @@ export const staffRouter = router({
 
       const hashedPassword = await bcrypt.hash(input.password, 10);
 
-      await db.insert(users).values({
+      const [newStaff] = await db.insert(users).values({
         fullName: input.fullName,
         nationalCode: input.nationalCode,
         phoneNumber: input.phoneNumber,
@@ -68,6 +69,14 @@ export const staffRouter = router({
         createdBy: ctx.session.user.id,
         gender: input.gender,
         birthDate: input.birthDate ? input.birthDate : null,
+      }).returning({ id: users.id });
+
+      // Audit Log
+      await logAudit(ctx, {
+        action: "create_staff",
+        resourceType: "user",
+        resourceId: newStaff.id,
+        details: { role: input.role, nationalCode: input.nationalCode, createdBy: ctx.session.user.id },
       });
 
       return { success: true };
@@ -127,6 +136,14 @@ export const staffRouter = router({
         .set(updateData)
         .where(eq(users.id, input.id));
 
+      // Audit Log
+      await logAudit(ctx, {
+        action: "update_staff",
+        resourceType: "user",
+        resourceId: input.id,
+        details: { changedFields: Object.keys(updateData) },
+      });
+
       return { success: true };
     }),
 
@@ -151,6 +168,14 @@ export const staffRouter = router({
       await db.update(users)
         .set({ status: newStatus })
         .where(eq(users.id, input.id));
+
+      // Audit Log
+      await logAudit(ctx, {
+        action: "toggle_staff_status",
+        resourceType: "user",
+        resourceId: input.id,
+        details: { oldStatus: staff.status, newStatus },
+      });
 
       return { success: true };
     }),
