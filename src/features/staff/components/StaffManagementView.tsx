@@ -76,6 +76,11 @@ export default function StaffManagementView() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const limit = 50;
+  const offset = (page - 1) * limit;
+
   // Modal State
   const [modalState, setModalState] = useState<{
     isOpen: boolean;
@@ -125,7 +130,7 @@ export default function StaffManagementView() {
       }
   });
 
-  const staffQuery = trpc.staff.getMyStaff.useQuery();
+  const staffQuery = trpc.staff.getMyStaff.useQuery({ limit, offset });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,6 +211,8 @@ export default function StaffManagementView() {
     });
   };
 
+  const totalPages = staffQuery.data ? Math.ceil(staffQuery.data.total / limit) : 0;
+
   return (
     <div className="flex h-full overflow-hidden bg-slate-50">
       <ConfirmationModal
@@ -219,8 +226,8 @@ export default function StaffManagementView() {
       />
 
       {/* Staff List Section */}
-      <section className="flex-1 p-8 overflow-y-auto">
-        <header className="mb-8">
+      <section className="flex-1 p-8 overflow-y-auto flex flex-col">
+        <header className="mb-8 shrink-0">
             <h1 className="text-3xl font-bold text-slate-900 mb-2">مدیریت پرسنل</h1>
             <p className="text-slate-500">مشاهده و مدیریت دسترسی‌های پرسنل مطب</p>
         </header>
@@ -228,10 +235,10 @@ export default function StaffManagementView() {
         {staffQuery.isLoading && <div className="text-center py-12 text-slate-500">در حال بارگذاری لیست پرسنل...</div>}
         {staffQuery.isError && <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">خطا در دریافت لیست پرسنل</div>}
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 flex-1 content-start">
             {staffQuery.data && (
-                staffQuery.data.map((staff) => (
-                    <div key={staff.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between group">
+                staffQuery.data.items.map((staff) => (
+                    <div key={staff.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between group h-fit">
                         <div className="flex items-center gap-4">
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold bg-slate-100 text-slate-600`}
                             >
@@ -278,6 +285,31 @@ export default function StaffManagementView() {
                 ))
             )}
         </div>
+
+        {/* Pagination Controls */}
+        {staffQuery.data && totalPages > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-4 shrink-0">
+                <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1 || staffQuery.isLoading}
+                    className="flex items-center gap-1 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <span className="material-symbols-outlined text-lg">chevron_right</span>
+                    قبلی
+                </button>
+                <span className="text-sm font-medium text-slate-600 font-numbers">
+                    صفحه {page} از {totalPages}
+                </span>
+                <button
+                    onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                    disabled={page === totalPages || staffQuery.isLoading}
+                    className="flex items-center gap-1 px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    بعدی
+                    <span className="material-symbols-outlined text-lg">chevron_left</span>
+                </button>
+            </div>
+        )}
       </section>
 
       {/* Create/Edit User Form Section */}

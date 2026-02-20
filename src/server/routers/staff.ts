@@ -2,7 +2,7 @@ import { router, doctorProcedure } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { TRPCError } from "@trpc/server";
 
@@ -10,8 +10,14 @@ const ALLOWED_STAFF_ROLES = ["clerk"] as const;
 
 export const staffRouter = router({
   getMyStaff: doctorProcedure
-    .query(async ({ ctx }) => {
+    .input(z.object({
+      limit: z.number().min(1).max(100).default(50),
+      offset: z.number().min(0).default(0),
+    }).optional())
+    .query(async ({ ctx, input }) => {
       // Role check is handled by doctorProcedure middleware
+      const limit = input?.limit ?? 50;
+      const offset = input?.offset ?? 0;
 
       const myStaff = await db.select({
         id: users.id,
@@ -25,9 +31,23 @@ export const staffRouter = router({
       })
       .from(users)
       .where(eq(users.createdBy, ctx.session.user.id))
-      .orderBy(desc(users.createdAt));
+      .orderBy(desc(users.createdAt))
+      .limit(limit)
+      .offset(offset);
 
-      return myStaff;
+      // Get total count for pagination
+      const totalCountRes = await db.select({ count: sql<number>`count(*)` })
+          .from(users)
+          .where(eq(users.createdBy, ctx.session.user.id));
+
+      const total = Number(totalCountRes[0].count);
+
+      return {
+          items: myStaff,
+          total,
+          limit,
+          offset
+      };
     }),
 
   createStaff: doctorProcedure
