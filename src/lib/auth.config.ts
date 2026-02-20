@@ -8,16 +8,19 @@ export const authConfig = {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnLogin = nextUrl.pathname.startsWith('/login');
+      const isOnForgotPassword = nextUrl.pathname.startsWith('/forgot-password');
       const isOnSetup2FA = nextUrl.pathname.startsWith('/setup-2fa');
-      const isPublic = isOnLogin;
+      const isPublic = isOnLogin || isOnForgotPassword;
 
       if (isLoggedIn) {
         const user = auth.user;
         const isStaff = user.role === 'doctor' || user.role === 'clerk';
         const isAdmin = user.role === 'admin';
+        const isDoctor = user.role === 'doctor';
+        const isClerk = user.role === 'clerk';
 
-        // Redirect logic for logged-in users trying to access login
-        if (isOnLogin) {
+        // Redirect logic for logged-in users trying to access public auth pages
+        if (isPublic) {
           if (isAdmin) return Response.redirect(new URL('/admin/users', nextUrl));
           // Staff redirection based on 2FA status
           if (isStaff && !user.totpEnabled) return Response.redirect(new URL('/setup-2fa', nextUrl));
@@ -47,6 +50,16 @@ export const authConfig = {
 
         // Admin Access Control
         if (nextUrl.pathname.startsWith('/admin') && !isAdmin) {
+             return Response.redirect(new URL('/dashboard', nextUrl));
+        }
+
+        // Doctor Access Control
+        if (nextUrl.pathname.startsWith('/doctors') && !isDoctor) {
+             return Response.redirect(new URL('/dashboard', nextUrl));
+        }
+
+        // Clerk Access Control
+        if (nextUrl.pathname.startsWith('/clerks') && !isClerk) {
              return Response.redirect(new URL('/dashboard', nextUrl));
         }
 
