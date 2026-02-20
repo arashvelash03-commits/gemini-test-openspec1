@@ -12,6 +12,12 @@ export const totpRouter = router({
     .mutation(async ({ ctx }) => {
       const user = await db.query.users.findFirst({
         where: eq(users.id, ctx.session.user.id),
+        columns: {
+          id: true,
+          nationalCode: true,
+          totpSecret: true,
+          totpEnabled: true,
+        },
       });
 
       if (!user) {
@@ -55,6 +61,10 @@ export const totpRouter = router({
       const { token } = input;
       const user = await db.query.users.findFirst({
         where: eq(users.id, ctx.session.user.id),
+        columns: {
+          id: true,
+          totpSecret: true,
+        },
       });
 
       if (!user || !user.totpSecret) {
