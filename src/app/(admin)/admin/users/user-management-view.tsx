@@ -25,6 +25,7 @@ export default function UserManagementView() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [page, setPage] = useState(1);
 
   const utils = trpc.useUtils();
 
@@ -60,7 +61,7 @@ export default function UserManagementView() {
       }
   });
 
-  const usersQuery = trpc.admin.getUsers.useQuery({});
+  const usersQuery = trpc.admin.getUsers.useQuery({ page, perPage: 10 });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,8 +105,8 @@ export default function UserManagementView() {
           phoneNumber: user.phoneNumber || "",
           role: user.role === "doctor" || user.role === "clerk" ? user.role : "doctor",
           password: "",
-          gender: "male", // Default or fetch if available (currently list doesn't return gender)
-          birthDate: "", // Default or fetch
+          gender: "male",
+          birthDate: "",
       });
       setError("");
       setSuccess("");
@@ -124,6 +125,9 @@ export default function UserManagementView() {
       });
   };
 
+  const users = usersQuery.data?.data || [];
+  const meta = usersQuery.data?.meta;
+
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50">
       {/* Users List Section (Right side in RTL) */}
@@ -136,9 +140,9 @@ export default function UserManagementView() {
         {usersQuery.isLoading && <div className="text-center py-12 text-slate-500">در حال بارگذاری لیست کاربران...</div>}
         {usersQuery.isError && <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">خطا در دریافت لیست کاربران</div>}
 
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            {usersQuery.data && (
-                usersQuery.data.map((user) => (
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 pb-20">
+            {users.length > 0 ? (
+                users.map((user) => (
                     <div key={user.id} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow flex items-center justify-between group">
                         <div className="flex items-center gap-4">
                             <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold
@@ -149,54 +153,67 @@ export default function UserManagementView() {
                                 {user.fullName ? user.fullName[0] : "?"}
                             </div>
                             <div>
-                                <h3 className="font-bold text-slate-900">{user.fullName || "نامشخص"}</h3>
+                                <h3 className="font-bold text-slate-900">{user.fullName || "بدون نام"}</h3>
                                 <div className="flex items-center gap-3 text-xs text-slate-500 mt-1">
-                                    <span className="bg-slate-50 px-2 py-0.5 rounded border border-slate-100 font-numbers">{user.nationalCode}</span>
-                                    <span className="flex items-center gap-1">
-                                        <span className={`w-1.5 h-1.5 rounded-full ${user.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                                        {user.role === 'doctor' ? 'پزشک' : user.role === 'clerk' ? 'منشی' : user.role === 'admin' ? 'مدیر' : user.role}
+                                    <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-medium">
+                                        {user.role === 'admin' ? 'مدیر سیستم' :
+                                         user.role === 'doctor' ? 'پزشک' :
+                                         user.role === 'clerk' ? 'منشی' : 'بیمار'}
                                     </span>
+                                    <span className="font-numbers">{user.nationalCode}</span>
                                 </div>
                             </div>
                         </div>
                         <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button
-                                onClick={() => handleEdit(user as User)}
-                                className="flex items-center gap-1 px-3 py-1.5 text-slate-600 hover:bg-slate-50 rounded-lg transition-colors text-xs font-medium border border-slate-100"
+                                onClick={() => handleEdit(user)}
+                                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-400 hover:text-blue-600 transition-colors"
+                                title="ویرایش"
                             >
-                                <span className="material-symbols-outlined text-sm">edit</span>
-                                ویرایش
+                                <span className="material-symbols-outlined text-[20px]">edit</span>
                             </button>
-                            {user.status === 'active' || user.status === 'error' ? (
+                            {user.role !== 'admin' && (
                                 <button
-                                    onClick={() => {
-                                        if(confirm(`آیا از غیرفعال‌سازی کاربر ${user.fullName} اطمینان دارید؟`)) {
-                                            deactivateUserMutation.mutate({ id: user.id });
-                                        }
-                                    }}
-                                    className="flex items-center gap-1 px-3 py-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors text-xs font-medium border border-red-50"
+                                    onClick={() => deactivateUserMutation.mutate({ id: user.id })}
+                                    className={`w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-100 transition-colors ${user.status === 'active' ? 'text-slate-400 hover:text-red-600' : 'text-red-500 hover:text-green-600'}`}
+                                    title={user.status === 'active' ? "غیرفعال کردن" : "فعال کردن"}
                                 >
-                                    <span className="material-symbols-outlined text-sm">person_off</span>
-                                    غیرفعال‌سازی
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={() => {
-                                        if(confirm(`آیا از فعال‌سازی مجدد کاربر ${user.fullName} اطمینان دارید؟`)) {
-                                            deactivateUserMutation.mutate({ id: user.id });
-                                        }
-                                    }}
-                                    className="flex items-center gap-1 px-3 py-1.5 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors text-xs font-medium border border-emerald-100"
-                                >
-                                    <span className="material-symbols-outlined text-sm">person_check</span>
-                                    فعال‌سازی مجدد
+                                    <span className="material-symbols-outlined text-[20px]">{user.status === 'active' ? 'block' : 'check_circle'}</span>
                                 </button>
                             )}
                         </div>
                     </div>
                 ))
+            ) : (
+                !usersQuery.isLoading && <div className="col-span-full text-center py-12 text-slate-500">هیچ کاربری یافت نشد.</div>
             )}
         </div>
+
+        {/* Pagination Controls */}
+        {meta && meta.totalPages > 1 && (
+            <div className="mt-8 flex justify-center items-center gap-4">
+                <button
+                    onClick={() => setPage(p => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                    className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 disabled:opacity-50 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                >
+                    <span className="material-symbols-outlined text-lg">chevron_right</span>
+                    قبلی
+                </button>
+                <span className="text-sm text-slate-600 font-numbers">
+                    صفحه {meta.page} از {meta.totalPages} (تعداد کل: {meta.totalCount})
+                </span>
+                <button
+                    onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+                    disabled={page === meta.totalPages}
+                    className="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 disabled:opacity-50 hover:bg-slate-50 transition-colors flex items-center gap-2"
+                >
+                    بعدی
+                    <span className="material-symbols-outlined text-lg">chevron_left</span>
+                </button>
+            </div>
+        )}
+
       </section>
 
       {/* Create/Edit User Form Section (Left side in RTL) */}
