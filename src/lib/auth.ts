@@ -1,3 +1,4 @@
+import { decrypt } from "@/lib/encryption";
 import NextAuth, { CredentialsSignin } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
@@ -89,7 +90,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               throw new TotpRequiredError();
             }
 
-            const isValidTotp = authenticator.check(totpCode, user.totpSecret);
+            const secret = decrypt(user.totpSecret); if (!secret) throw new Error("Invalid TOTP secret"); const isValidTotp = authenticator.check(totpCode, secret);
             if (!isValidTotp) {
                 throw new InvalidTotpError();
             }

@@ -30,7 +30,7 @@ export const users = pgTable("users", {
   status: fhirStatusEnum("status").default("active"),
   resourceType: text("resource_type").notNull(), // CHECK constraint not directly supported in column def
   fhirData: jsonb("fhir_data").default({}).notNull(),
-  // TODO: This should be encrypted at rest.
+  // Encrypted at rest
   totpSecret: text("totp_secret"),
   totpEnabled: boolean("totp_enabled").default(false),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),

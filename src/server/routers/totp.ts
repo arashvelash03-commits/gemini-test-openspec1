@@ -1,3 +1,4 @@
+import { encrypt, decrypt } from "@/lib/encryption";
 import { protectedProcedure, router } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -25,7 +26,7 @@ export const totpRouter = router({
           return { secret: null, qrCodeUrl: null, alreadyEnabled: true };
       }
 
-      let secret = user.totpSecret;
+      let secret = user.totpSecret ? decrypt(user.totpSecret) : null;
 
       // If no secret exists, or if we want to ensure a secret exists for setup
       if (!secret) {
@@ -33,7 +34,7 @@ export const totpRouter = router({
           // Save secret to DB (enabled=false until verified)
           await db
             .update(users)
-            .set({ totpSecret: secret, totpEnabled: false })
+            .set({ totpSecret: encrypt(secret), totpEnabled: false })
             .where(eq(users.id, user.id));
       }
 
@@ -64,7 +65,7 @@ export const totpRouter = router({
         });
       }
 
-      const isValid = authenticator.check(token, user.totpSecret);
+      const secret = decrypt(user.totpSecret); if (!secret) throw new TRPCError({ code: "BAD_REQUEST", message: "TOTP setup not initiated" }); const isValid = authenticator.check(token, secret);
 
       if (!isValid) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid token" });
