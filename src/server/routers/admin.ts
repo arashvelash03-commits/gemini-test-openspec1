@@ -2,30 +2,53 @@ import { router, protectedProcedure } from "../trpc";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export const adminRouter = router({
   getUsers: protectedProcedure
-    .input(z.object({}).optional()) // Allow optional empty input to match frontend call if needed
-    .query(async ({ ctx }) => {
+    .input(z.object({
+      page: z.number().min(1).optional().default(1),
+      perPage: z.number().min(1).max(100).optional().default(10),
+    }).optional())
+    .query(async ({ ctx, input }) => {
       // Basic RBAC check
       if (ctx.session.user.role !== "admin") {
         throw new Error("Unauthorized");
       }
 
-      const allUsers = await db.select({
-        id: users.id,
-        fullName: users.fullName,
-        nationalCode: users.nationalCode,
-        phoneNumber: users.phoneNumber,
-        role: users.role,
-        status: users.status,
-      })
-      .from(users)
-      .orderBy(desc(users.createdAt));
+      const page = input?.page ?? 1;
+      const perPage = input?.perPage ?? 10;
+      const offset = (page - 1) * perPage;
 
-      return allUsers;
+      const [data, totalCountResult] = await Promise.all([
+        db.select({
+          id: users.id,
+          fullName: users.fullName,
+          nationalCode: users.nationalCode,
+          phoneNumber: users.phoneNumber,
+          role: users.role,
+          status: users.status,
+        })
+        .from(users)
+        .orderBy(desc(users.createdAt))
+        .limit(perPage)
+        .offset(offset),
+        db.select({ count: sql<number>`count(*)` }).from(users)
+      ]);
+
+      const totalCount = Number(totalCountResult[0].count);
+      const totalPages = Math.ceil(totalCount / perPage);
+
+      return {
+        data,
+        meta: {
+          page,
+          perPage,
+          totalCount,
+          totalPages,
+        }
+      };
     }),
 
   createUser: protectedProcedure
