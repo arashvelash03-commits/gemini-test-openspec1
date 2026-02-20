@@ -10,6 +10,13 @@ export const profileRouter = router({
     .query(async ({ ctx }) => {
       const user = await db.query.users.findFirst({
         where: eq(users.id, ctx.session.user.id),
+        columns: {
+          fullName: true,
+          nationalCode: true,
+          phoneNumber: true,
+          totpEnabled: true,
+          birthDate: true,
+        },
       });
 
       if (!user) {
@@ -39,6 +46,9 @@ export const profileRouter = router({
       if (input.nationalCode) {
         const existingUser = await db.query.users.findFirst({
           where: eq(users.nationalCode, input.nationalCode),
+          columns: {
+            id: true,
+          },
         });
 
         if (existingUser && existingUser.id !== ctx.session.user.id) {
@@ -66,6 +76,9 @@ export const profileRouter = router({
     .mutation(async ({ input, ctx }) => {
       const user = await db.query.users.findFirst({
         where: eq(users.id, ctx.session.user.id),
+        columns: {
+          passwordHash: true,
+        },
       });
 
       if (!user || !user.passwordHash) {
