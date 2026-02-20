@@ -46,6 +46,7 @@ export const staffRouter = router({
       // Unique check (globally unique national code)
       const existingUser = await db.query.users.findFirst({
         where: eq(users.nationalCode, input.nationalCode),
+        columns: { id: true },
       });
 
       if (existingUser) {
@@ -89,6 +90,7 @@ export const staffRouter = router({
       // Ensure ownership
       const existingStaff = await db.query.users.findFirst({
         where: and(eq(users.id, input.id), eq(users.createdBy, ctx.session.user.id)),
+        columns: { id: true, nationalCode: true },
       });
 
       if (!existingStaff) {
@@ -102,6 +104,7 @@ export const staffRouter = router({
       if (input.nationalCode !== existingStaff.nationalCode) {
           const duplicate = await db.query.users.findFirst({
               where: eq(users.nationalCode, input.nationalCode),
+              columns: { id: true },
           });
           if (duplicate) {
               throw new TRPCError({
@@ -137,6 +140,7 @@ export const staffRouter = router({
 
       const staff = await db.query.users.findFirst({
           where: and(eq(users.id, input.id), eq(users.createdBy, ctx.session.user.id)),
+          columns: { id: true, status: true },
       });
 
       if (!staff) {
